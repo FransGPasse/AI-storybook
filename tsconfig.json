@@ -21,7 +21,8 @@
     "src/**/*.d.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "src/services/API.ts"
+    "src/services/API.ts",
+    "src/router/index.js"
   ],
   "references": [
     {

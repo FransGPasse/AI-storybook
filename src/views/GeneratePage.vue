@@ -12,18 +12,17 @@ const getImageLink = async (prompt: string) => {
 </script>
 
 <template>
-  <div class="homepage">
-    <h1>Welcome to the AI storybook</h1>
+  <div class="cover-page">
     <input v-model="prompt" placeholder="Dream up something..." />
     <button @click="getImageLink(prompt)" :disabled="!prompt">
       Generate image
     </button>
-    <img :src="imageURL" alt="" />
+    <img v-if="imageURL" :src="imageURL" :alt="prompt" />
   </div>
 </template>
 
 <style scoped>
-.homepage {
+.cover-page {
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -32,17 +31,9 @@ const getImageLink = async (prompt: string) => {
   justify-content: center;
 }
 
-h1 {
-  background-color: #f3ec78;
-  background-image: linear-gradient(90deg, #f3ec78, #fd4343);
-  background-size: 100%;
-  -webkit-background-clip: text;
-  -moz-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -moz-text-fill-color: transparent;
-
-  font-size: 5rem;
+input {
+  height: 6%;
+  width: 35%;
   text-align: center;
 }
 
