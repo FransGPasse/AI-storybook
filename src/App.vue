@@ -26,6 +26,15 @@
   font-family: var(--font-UI);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--cover-title-color);
+}
+
 body {
   background-color: var(--bg-color);
 }

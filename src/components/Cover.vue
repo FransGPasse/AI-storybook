@@ -25,12 +25,17 @@
   min-height: min(650px, 75dvh);
   width: min(450px, 80%);
 
-  background-image: url("../assets/leather_cover.jpg");
+  background-image: url("../assets/images/leather_cover.jpg");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
 
   border-radius: 8px;
+}
+
+.cover:hover,
+.title-input:hover {
+  cursor: url("../assets/images/writing_hand.png"), auto;
 }
 
 .title-page {
