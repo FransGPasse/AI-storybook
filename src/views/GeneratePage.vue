@@ -2,6 +2,9 @@
 import { generateImage } from "../services/API.js";
 import { ref } from "vue";
 
+import Button from "../components/Button.vue";
+import Cover from "../components/Cover.vue";
+
 const prompt = ref("");
 const imageURL = ref("");
 
@@ -13,11 +16,14 @@ const getImageLink = async (prompt: string) => {
 
 <template>
   <div class="cover-page">
-    <input v-model="prompt" placeholder="Dream up something..." />
-    <button @click="getImageLink(prompt)" :disabled="!prompt">
-      Generate image
-    </button>
+    <Cover />
     <img v-if="imageURL" :src="imageURL" :alt="prompt" />
+    <input v-model="prompt" placeholder="Dream up something..." />
+    <Button
+      @click="getImageLink(prompt)"
+      :disabled="!prompt"
+      text="Generate image"
+    />
   </div>
 </template>
 
@@ -32,9 +38,14 @@ const getImageLink = async (prompt: string) => {
 }
 
 input {
-  height: 6%;
-  width: 35%;
+  height: 50px;
+  width: min(400px, 75%);
   text-align: center;
+  margin-bottom: 10px;
+}
+
+input:focus::placeholder {
+  color: transparent;
 }
 
 img {

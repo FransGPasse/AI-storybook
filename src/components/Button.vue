@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const props = defineProps({
+defineProps({
   text: String,
 });
 </script>
@@ -8,4 +8,31 @@ const props = defineProps({
   <button>{{ text }}</button>
 </template>
 
-<style scoped></style>
+<style scoped>
+button {
+  text-decoration: none;
+
+  min-width: 150px;
+  height: 40px;
+
+  cursor: pointer;
+
+  border: none;
+  border-radius: 999px;
+  background-color: var(--btn-color);
+
+  white-space: nowrap;
+
+  transition: all 350ms ease;
+}
+
+button:hover {
+  background-color: rgb(215, 122, 14);
+  translate: 0px -2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  translate: 0px -2px;
+}
+</style>

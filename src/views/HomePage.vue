@@ -6,8 +6,8 @@ import Button from "../components/Button.vue";
   <div class="homepage">
     <h1>Welcome to the AI storybook</h1>
 
-    <router-link to="/generate"
-      ><Button text="Start dreaming &rarr;" />
+    <router-link to="/generate">
+      <Button text="Start dreaming &rarr;" />
     </router-link>
   </div>
 </template>
@@ -34,5 +34,7 @@ h1 {
 
   font-size: 5rem;
   text-align: center;
+
+  margin: 20px;
 }
 </style>
