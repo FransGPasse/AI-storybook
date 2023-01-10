@@ -9,7 +9,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
 
 :root {
-  --bg-color: rgb(21, 37, 58);
+  --bg-color: rgb(76, 100, 131);
   --btn-color: rgb(247, 156, 10);
   --cover-title-color: rgb(255, 179, 57);
 

@@ -7,27 +7,27 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
-const generateCover = async (prompt: string) => {
+const generateCover = async (prompt: string, number: number) => {
   try {
     const result = await openai.createImage({
-      prompt: prompt + "no text, book cover",
-      n: 1,
+      prompt: prompt,
+      n: number,
       size: "1024x1024",
     });
-    return result.data.data[0].url;
+    return result.data.data;
   } catch (error) {
     console.error(error);
   }
 };
 
-const generateImage = async (prompt: string) => {
+const generateImage = async (prompt: string, number: number) => {
   try {
     const result = await openai.createImage({
       prompt: prompt,
-      n: 1,
+      n: number,
       size: "512x512",
     });
-    return result.data.data[0].url;
+    return result.data.data;
   } catch (error) {
     console.error(error);
   }

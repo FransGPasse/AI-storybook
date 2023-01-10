@@ -28,7 +28,6 @@ button {
 
 button:hover {
   background-color: rgb(215, 122, 14);
-  translate: 0px -2px;
 }
 
 button:disabled {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { userStore } from "../store/user.js";
+import { userStore } from "../store/store.js";
 import { auth } from "../firebase/index";
 import { createUserWithEmailAndPassword } from "@firebase/auth";
 import Button from "../components/Button.vue";
