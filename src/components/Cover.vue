@@ -9,6 +9,8 @@ const store = pageStore();
 const prompt = ref("");
 const imageURL = ref("");
 
+const isActive = ref(false);
+
 const createCover = async (prompt: string, number: number) => {
   const results = await generateCover(prompt, number);
   store.generatedImagesArray = results!.map((result) => result.url);
@@ -16,15 +18,13 @@ const createCover = async (prompt: string, number: number) => {
 };
 
 const prevImg = () => {
-  imageURL.value = store.generatedImagesArray[store.currentArrayValue - 1];
   store.currentArrayValue -= 1;
-  console.log(store.currentArrayValue);
+  imageURL.value = store.generatedImagesArray[store.currentArrayValue];
 };
 
 const nextImg = () => {
-  imageURL.value = store.generatedImagesArray[store.currentArrayValue + 1];
   store.currentArrayValue += 1;
-  console.log(store.currentArrayValue);
+  imageURL.value = store.generatedImagesArray[store.currentArrayValue];
 };
 </script>
 
@@ -43,7 +43,7 @@ const nextImg = () => {
       "
     />
   </div>
-  <div class="cover">
+  <div class="cover" @click="isActive = true" :class="{ active: isActive }">
     <img
       v-if="imageURL"
       :src="imageURL"
@@ -99,11 +99,14 @@ const nextImg = () => {
   transform: skewY(15deg);
   rotate: -20deg;
   transition: all 550ms ease-in-out;
+
+  box-shadow: -20px 15px 15px rgba(0, 0, 0, 0.544);
 }
 
-.cover:hover {
+.active {
   rotate: 0deg;
   transform: skewY(0deg);
+  box-shadow: none;
 }
 
 .cover:hover,

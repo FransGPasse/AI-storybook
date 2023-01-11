@@ -6,7 +6,7 @@ import Button from "../components/Button.vue";
   <div class="homepage">
     <h1>Welcome to the AI storybook</h1>
 
-    <router-link to="/generate">
+    <router-link to="/authenticate">
       <Button text="Start dreaming &rarr;" />
     </router-link>
   </div>

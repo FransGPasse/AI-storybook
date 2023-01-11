@@ -32,6 +32,5 @@ button:hover {
 
 button:disabled {
   cursor: not-allowed;
-  translate: 0px -2px;
 }
 </style>
