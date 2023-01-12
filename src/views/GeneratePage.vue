@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Cover from "../components/Cover.vue";
+import Footer from "../components/Footer.vue";
 import { userStore } from "../store/store";
 
 const store = userStore();
@@ -7,8 +8,8 @@ const store = userStore();
 
 <template>
   <div class="generate-page">
-    <h2 v-if="store.loggedIn">Logged in as {{ store.user.email }}</h2>
     <Cover />
+    <Footer />
   </div>
 </template>
 
