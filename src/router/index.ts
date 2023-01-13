@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import AuthenticationPage from "../views/AuthenticationPage.vue";
 import HomePage from "../views/HomePage.vue";
 import GeneratePage from "../views/GeneratePage.vue";
+import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 
 const routes = [
@@ -28,12 +29,29 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
+/* Tries to get the current user and resolve, otherwise reject */
+function getCurrentUser() {
+  return new Promise((resolve, reject) => {
+    const removeListener = onAuthStateChanged(
+      auth,
+      (user) => {
+        removeListener();
+        resolve(user);
+      },
+      reject
+    );
+  });
+}
+
+/* Checks all routes to see if user is authorized and logged in, otherwise redirect to auth-page */
+router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !auth.currentUser) {
-    return {
-      path: "/authenticate",
-      query: { redirect: to.fullPath },
-    };
+    if (await getCurrentUser()) {
+      return {
+        path: "/authenticate",
+        query: { redirect: to.fullPath },
+      };
+    }
   }
 });
 

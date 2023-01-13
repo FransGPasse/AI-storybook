@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { generateCover } from "../services/API.js";
+import { generateCover, uploadImage } from "../services/API.js";
 import { ref } from "vue";
 import Button from "../components/Button.vue";
 import { pageStore } from "../store/store";
@@ -17,28 +17,24 @@ async function createCover(prompt: string, number: number) {
   imageURL.value = store.generatedImagesArray[0];
 }
 
-function prevImg() {
-  store.currentArrayValue -= 1;
-  imageURL.value = store.generatedImagesArray[store.currentArrayValue];
-}
-
-function nextImg() {
-  store.currentArrayValue += 1;
+function switchImage(direction: string) {
+  if (direction === "previous") store.currentArrayValue -= 1;
+  if (direction === "next") store.currentArrayValue += 1;
   imageURL.value = store.generatedImagesArray[store.currentArrayValue];
 }
 </script>
 
 <template>
-  <div class="book-wrapper">
+  <div class="book-container">
     <div class="button-wrapper" v-show="imageURL">
       <Button
         text="Previous"
-        @click="prevImg"
+        @click="switchImage('previous')"
         :disabled="store.currentArrayValue === 0"
       />
       <Button
         text="Next"
-        @click="nextImg"
+        @click="switchImage('next')"
         :disabled="
           store.generatedImagesArray.length - 1 === store.currentArrayValue
         "
@@ -65,15 +61,21 @@ function nextImg() {
       </div>
     </div>
     <Button
-      @click="createCover(prompt, 2)"
+      @click="createCover(prompt, 1)"
       text="Generate a cover"
       :disabled="!prompt"
+    />
+    <Button
+      v-show="imageURL"
+      @click="uploadImage(imageURL, prompt)"
+      text="Choose this image"
+      :disabled="!imageURL"
     />
   </div>
 </template>
 
 <style scoped>
-.book-wrapper {
+.book-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -81,8 +83,6 @@ function nextImg() {
   margin: auto;
 
   width: 100%;
-
-  overflow-x: hidden;
 }
 
 .button-wrapper {
@@ -92,6 +92,7 @@ function nextImg() {
   justify-content: space-evenly;
   margin-bottom: 10px;
 }
+
 .cover {
   display: flex;
   flex-direction: column;
@@ -99,8 +100,8 @@ function nextImg() {
 
   position: relative;
 
-  height: min(700px, 65dvh);
-  width: min(500px, 70%);
+  height: min(650px, 70dvh);
+  width: min(450px, 70%);
 
   background-image: url(src/assets/images/leather_cover.jpg);
   background-size: cover;
@@ -159,11 +160,13 @@ function nextImg() {
 
   resize: none;
 
-  font-size: 2.5rem;
+  font-size: 3rem;
 
   border: none;
 
   overflow: hidden;
+
+  text-shadow: black -1px 2px 3px;
 }
 
 .title-input::placeholder {
@@ -176,5 +179,6 @@ function nextImg() {
 
 .title-input:focus::placeholder {
   color: transparent;
+  text-shadow: none;
 }
 </style>

@@ -70,7 +70,7 @@ async function login(email: string, password: string) {
       :text="
         newUser
           ? 'or log in to an existing account...'
-          : 'or sign up a new account...'
+          : 'or register a new account...'
       "
     />
   </div>
