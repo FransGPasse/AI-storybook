@@ -1,59 +1,42 @@
-const API_KEY = import.meta.env.VITE_OPEN_AI_API_KEY;
 import { Configuration, OpenAIApi } from "openai";
-import {
-  ref as refrenceToStorage,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { ref, uploadString } from "firebase/storage";
 import { storage } from "../firebase/index";
 import { auth } from "../firebase/index";
+
+const API_KEY = import.meta.env.VITE_OPEN_AI_API_KEY;
 
 const configuration = new Configuration({
   apiKey: API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
-async function generateCover(prompt: string, number: number) {
+async function generateImage(prompt: string, number: number, cover: boolean) {
+  const imageSize = cover ? "1024x1024" : "512x512";
   try {
     const result = await openai.createImage({
       prompt: prompt,
       n: number,
-      size: "512x512",
+      size: imageSize,
+      response_format: "b64_json",
     });
+
     return result.data.data;
   } catch (error) {
     console.error(error);
   }
 }
 
-async function generateImage(prompt: string, number: number) {
+async function uploadImage(b64_string: string, prompt: string) {
   try {
-    const result = await openai.createImage({
-      prompt: prompt,
-      n: number,
-      size: "512x512",
-    });
-    return result.data.data;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function uploadImage(url: string, prompt: string) {
-  console.log(url);
-  try {
-    const storageRef = refrenceToStorage(
+    const storageRef = ref(
       storage,
-      `stories/${auth.currentUser?.uid}/${prompt}`
+      `stories/${auth.currentUser?.email}/${prompt}`
     );
 
-    const result = await fetch(url);
-    const blob = await result.blob();
-    const file = new File([blob], `${Date.now()}.png`);
-
-    uploadBytesResumable(storageRef, file);
+    uploadString(storageRef, b64_string, "data_url");
   } catch (error) {
     console.error(error);
   }
 }
 
-export { generateCover, generateImage, uploadImage };
+export { generateImage, uploadImage };

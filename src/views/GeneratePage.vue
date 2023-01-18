@@ -1,9 +1,6 @@
 <script setup lang="ts">
 import Cover from "../components/Cover.vue";
 import Footer from "../components/Footer.vue";
-import { userStore } from "../store/store";
-
-const store = userStore();
 </script>
 
 <template>

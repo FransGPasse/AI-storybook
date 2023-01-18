@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { generateCover, uploadImage } from "../services/API.js";
+import { generateImage, uploadImage } from "../services/API.js";
 import { ref } from "vue";
 import Button from "../components/Button.vue";
 import { pageStore } from "../store/store";
@@ -8,19 +8,23 @@ const store = pageStore();
 
 const prompt = ref("");
 const imageURL = ref("");
+const b64_helper = ref("data:image/png;base64,");
 
 const isActive = ref(false);
 
 async function createCover(prompt: string, number: number) {
-  const results = await generateCover(prompt, number);
-  store.generatedImagesArray = results!.map((result) => result.url);
-  imageURL.value = store.generatedImagesArray[0];
+  const results = await generateImage(prompt, number, true);
+  store.generatedImagesArray = results!.map((result) => result.b64_json);
+
+  imageURL.value = b64_helper.value + store.generatedImagesArray[0];
 }
 
 function switchImage(direction: string) {
   if (direction === "previous") store.currentArrayValue -= 1;
   if (direction === "next") store.currentArrayValue += 1;
-  imageURL.value = store.generatedImagesArray[store.currentArrayValue];
+
+  imageURL.value =
+    b64_helper.value + store.generatedImagesArray[store.currentArrayValue];
 }
 </script>
 
@@ -61,7 +65,7 @@ function switchImage(direction: string) {
       </div>
     </div>
     <Button
-      @click="createCover(prompt, 1)"
+      @click="createCover(prompt, 2)"
       text="Generate a cover"
       :disabled="!prompt"
     />

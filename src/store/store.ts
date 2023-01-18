@@ -28,6 +28,7 @@ const pageStore = defineStore("pages", () => {
   const currentArrayValue = ref(0);
 
   const generatedImagesArray: any = ref([]);
+
   return { numberOfPages, generatedImagesArray, currentArrayValue };
 });
 
