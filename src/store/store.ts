@@ -23,13 +23,15 @@ const userStore = defineStore(
 );
 
 /* ... and one for the last generated images */
-const pageStore = defineStore("pages", () => {
+const generationStore = defineStore("pages", () => {
   const numberOfPages = ref(5);
   const currentArrayValue = ref(0);
 
   const generatedImagesArray: any = ref([]);
 
-  return { numberOfPages, generatedImagesArray, currentArrayValue };
+  const isLoading = ref(false);
+
+  return { numberOfPages, generatedImagesArray, currentArrayValue, isLoading };
 });
 
-export { userStore, pageStore };
+export { userStore, generationStore };

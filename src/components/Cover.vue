@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { generateImage, uploadImage } from "../services/API.js";
 import { ref } from "vue";
+import { generateImage, uploadImage } from "../services/API.js";
 import Button from "../components/Button.vue";
-import { pageStore } from "../store/store";
+import { generationStore } from "../store/store";
 
-const store = pageStore();
+const store = generationStore();
 
 const prompt = ref("");
 const imageURL = ref("");
@@ -13,18 +13,22 @@ const b64_helper = ref("data:image/png;base64,");
 const isActive = ref(false);
 
 async function createCover(prompt: string, number: number) {
-  const results = await generateImage(prompt, number, true);
+  store.isLoading = true;
+  const results = await generateImage(prompt, number, false);
   store.generatedImagesArray = results!.map((result) => result.b64_json);
 
   imageURL.value = b64_helper.value + store.generatedImagesArray[0];
+  store.isLoading = false;
 }
 
 function switchImage(direction: string) {
+  store.isLoading = true;
   if (direction === "previous") store.currentArrayValue -= 1;
   if (direction === "next") store.currentArrayValue += 1;
 
   imageURL.value =
     b64_helper.value + store.generatedImagesArray[store.currentArrayValue];
+  store.isLoading = false;
 }
 </script>
 
@@ -32,12 +36,12 @@ function switchImage(direction: string) {
   <div class="book-container">
     <div class="button-wrapper" v-show="imageURL">
       <Button
-        text="Previous"
+        text="&larr; Previous"
         @click="switchImage('previous')"
         :disabled="store.currentArrayValue === 0"
       />
       <Button
-        text="Next"
+        text="Next &rarr;"
         @click="switchImage('next')"
         :disabled="
           store.generatedImagesArray.length - 1 === store.currentArrayValue
@@ -46,7 +50,7 @@ function switchImage(direction: string) {
     </div>
     <div class="cover" @click="isActive = true" :class="{ active: isActive }">
       <img
-        v-if="imageURL"
+        v-show="imageURL"
         :src="imageURL"
         :alt="prompt"
         class="generated-cover"
@@ -64,17 +68,19 @@ function switchImage(direction: string) {
         />
       </div>
     </div>
-    <Button
-      @click="createCover(prompt, 2)"
-      text="Generate a cover"
-      :disabled="!prompt"
-    />
-    <Button
-      v-show="imageURL"
-      @click="uploadImage(imageURL, prompt)"
-      text="Choose this image"
-      :disabled="!imageURL"
-    />
+    <div class="button-wrapper">
+      <Button
+        @click="createCover(prompt, 1)"
+        text="Generate a cover"
+        :disabled="!prompt"
+      />
+      <Button
+        v-show="imageURL"
+        @click="uploadImage(imageURL, prompt)"
+        text="Choose this image"
+        :disabled="!imageURL"
+      />
+    </div>
   </div>
 </template>
 
@@ -87,6 +93,9 @@ function switchImage(direction: string) {
   margin: auto;
 
   width: 100%;
+
+  transform-style: preserve-3d;
+  perspective: 200px;
 }
 
 .button-wrapper {
@@ -94,7 +103,6 @@ function switchImage(direction: string) {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  margin-bottom: 10px;
 }
 
 .cover {
@@ -114,9 +122,10 @@ function switchImage(direction: string) {
 
   border-radius: 8px;
 
-  margin-bottom: 40px;
+  margin-block: 25px;
   transform: skewY(15deg);
   rotate: -20deg;
+
   transition: all 550ms ease-in-out;
 
   box-shadow: -20px 15px 15px rgba(0, 0, 0, 0.544);
@@ -143,6 +152,8 @@ function switchImage(direction: string) {
   left: 0;
   z-index: -1;
   border-radius: 8px;
+
+  filter: brightness(0.8);
 }
 
 .title-page {
@@ -170,7 +181,7 @@ function switchImage(direction: string) {
 
   overflow: hidden;
 
-  text-shadow: black -1px 2px 3px;
+  text-shadow: black -1px 2px 2px;
 }
 
 .title-input::placeholder {

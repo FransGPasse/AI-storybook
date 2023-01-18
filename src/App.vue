@@ -1,6 +1,13 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { generationStore } from "./store/store";
+
+const store = generationStore();
+</script>
 
 <template>
+  <div v-show="store.isLoading" id="loading">
+    <h2>Loading...</h2>
+  </div>
   <router-view />
 </template>
 
@@ -38,5 +45,29 @@ h6 {
 
 body {
   background-color: var(--bg-color);
+}
+
+#loading {
+  position: fixed;
+
+  height: 100dvh;
+  width: 100dvw;
+
+  background-color: rgba(0, 0, 0, 0.575);
+
+  z-index: 999;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#loading > h2 {
+  color: var(--cover-title-color);
+
+  font-size: 2.5rem;
+
+  pointer-events: none;
 }
 </style>

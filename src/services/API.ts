@@ -39,4 +39,6 @@ async function uploadImage(b64_string: string, prompt: string) {
   }
 }
 
-export { generateImage, uploadImage };
+async function uploadPage(b64_string: string, prompt: string, text: string) {}
+
+export { generateImage, uploadImage, uploadPage };
