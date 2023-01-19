@@ -100,23 +100,7 @@ body {
 
     --book-rz: 280px;
 
-    --book-position: 12%;
-  }
-}
-
-/* Desktop size */
-@media screen and (min-width: 1200px) {
-  :root {
-    --title-size: 2.5rem;
-
-    --book-front-h: 550px;
-    --book-front-w: 400px;
-
-    --book-top-w: 390px;
-
-    --book-rz: 335px;
-
-    --book-position: 10%;
+    --book-position: 8%;
   }
 }
 </style>
