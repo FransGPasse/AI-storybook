@@ -38,7 +38,7 @@ const store = generationStore();
   --book-z: 60px;
   --book-rz: 180px;
 
-  --book-position: 15dvh;
+  --book-position: 15%;
 }
 
 *,
@@ -99,6 +99,8 @@ body {
     --book-top-w: 340px;
 
     --book-rz: 280px;
+
+    --book-position: 12%;
   }
 }
 
@@ -107,14 +109,14 @@ body {
   :root {
     --title-size: 2.5rem;
 
-    --book-front-h: 600px;
-    --book-front-w: 450px;
+    --book-front-h: 550px;
+    --book-front-w: 400px;
 
-    --book-top-w: 440px;
+    --book-top-w: 390px;
 
-    --book-rz: 380px;
+    --book-rz: 335px;
 
-    --book-position: 8dvh;
+    --book-position: 10%;
   }
 }
 </style>
