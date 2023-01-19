@@ -16,12 +16,27 @@ const store = generationStore();
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
 
 :root {
-  --bg-color: rgb(11, 40, 78);
+  --bg-color: rgb(29, 31, 81);
   --btn-color: rgb(247, 156, 10);
-  --cover-title-color: rgb(255, 179, 57);
+
+  --title-color: rgb(255, 179, 57);
+  --title-size: 2.2rem;
 
   --font-UI: "Kanit", sans-serif;
   --font-title: "Dancing Script", cursive;
+
+  --book-front-h: 500px;
+  --book-front-w: 350px;
+
+  --book-top-h: 120px;
+  --book-top-w: 340px;
+
+  --book-side-w: 120px;
+
+  --book-z: 60px;
+  --book-rz: 280px;
+
+  --book-position: 15dvh;
 }
 
 *,
@@ -64,10 +79,26 @@ body {
 }
 
 #loading > h2 {
-  color: var(--cover-title-color);
+  color: var(--title-color);
 
   font-size: 2.5rem;
 
   pointer-events: none;
+}
+
+/* Desktop size */
+@media screen and (min-width: 1025px) {
+  :root {
+    --title-size: 2.5rem;
+
+    --book-front-h: 600px;
+    --book-front-w: 450px;
+
+    --book-top-w: 440px;
+
+    --book-rz: 380px;
+
+    --book-position: 10dvh;
+  }
 }
 </style>

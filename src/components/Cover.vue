@@ -14,7 +14,7 @@ const isActive = ref(false);
 
 async function createCover(prompt: string, number: number) {
   store.isLoading = true;
-  const results = await generateImage(prompt, number, false);
+  const results = await generateImage(prompt, number, true);
   store.generatedImagesArray = results!.map((result) => result.b64_json);
 
   imageURL.value = b64_helper.value + store.generatedImagesArray[0];
@@ -33,7 +33,7 @@ function switchImage(direction: string) {
 </script>
 
 <template>
-  <div class="book-container">
+  <div class="book-container" :class="{ generated: imageURL }">
     <div class="button-wrapper" v-show="imageURL">
       <Button
         text="&larr; Previous"
@@ -48,29 +48,36 @@ function switchImage(direction: string) {
         "
       />
     </div>
-    <div class="cover" @click="isActive = true" :class="{ active: isActive }">
-      <img
-        v-show="imageURL"
-        :src="imageURL"
-        :alt="prompt"
-        class="generated-cover"
-      />
-      <div class="title-page">
-        <textarea
-          class="title-input"
-          placeholder="Give me a title"
-          wrap="hard"
-          rows="3"
-          cols="20"
-          maxlength="65"
-          required
-          v-model="prompt"
+    <div class="book" @click="isActive = true" :class="{ active: isActive }">
+      <div class="side leather front">
+        <img
+          v-show="imageURL"
+          :src="imageURL"
+          :alt="prompt"
+          class="generated-cover"
         />
+        <div class="title-page">
+          <textarea
+            class="title-input"
+            placeholder="Give me a title"
+            wrap="hard"
+            rows="3"
+            cols="20"
+            maxlength="65"
+            required
+            v-model="prompt"
+          />
+        </div>
       </div>
+      <div class="side leather back"></div>
+      <div class="side leather left">{{ prompt }}</div>
+      <div class="side right"></div>
+      <div class="side top"></div>
+      <div class="side bottom"></div>
     </div>
     <div class="button-wrapper">
       <Button
-        @click="createCover(prompt, 1)"
+        @click="createCover(prompt, 2)"
         text="Generate a cover"
         :disabled="!prompt"
       />
@@ -86,16 +93,22 @@ function switchImage(direction: string) {
 
 <style scoped>
 .book-container {
+  position: relative;
+
+  transform-style: preserve-3d;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  margin: auto;
+  justify-content: flex-end;
+  margin-block: 30px;
 
   width: 100%;
+  height: 100%;
+}
 
-  transform-style: preserve-3d;
-  perspective: 200px;
+.generated {
+  justify-content: space-between;
 }
 
 .button-wrapper {
@@ -103,43 +116,6 @@ function switchImage(direction: string) {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-}
-
-.cover {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  position: relative;
-
-  height: min(650px, 70dvh);
-  width: min(450px, 70%);
-
-  background-image: url(src/assets/images/leather_cover.jpg);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-
-  border-radius: 8px;
-
-  margin-block: 25px;
-  transform: skewY(15deg);
-  rotate: -20deg;
-
-  transition: all 550ms ease-in-out;
-
-  box-shadow: -20px 15px 15px rgba(0, 0, 0, 0.544);
-}
-
-.active {
-  rotate: 0deg;
-  transform: skewY(0deg);
-  box-shadow: none;
-}
-
-.cover:hover,
-.title-input:hover {
-  cursor: url("../assets/images/writing_hand.png"), auto;
 }
 
 .generated-cover {
@@ -151,7 +127,7 @@ function switchImage(direction: string) {
   top: 0;
   left: 0;
   z-index: -1;
-  border-radius: 8px;
+  border-radius: 0px 8px 8px 0px;
 
   filter: brightness(0.8);
 }
@@ -164,7 +140,8 @@ function switchImage(direction: string) {
   justify-content: flex-start;
 }
 
-.title-input {
+.title-input,
+.left {
   color: rgb(255, 188, 18);
   background-color: transparent;
 
@@ -175,7 +152,7 @@ function switchImage(direction: string) {
 
   resize: none;
 
-  font-size: 3rem;
+  font-size: var(--title-size);
 
   border: none;
 
@@ -185,7 +162,7 @@ function switchImage(direction: string) {
 }
 
 .title-input::placeholder {
-  color: var(--cover-title-color);
+  color: var(--title-color);
 }
 
 .title-input:focus {
@@ -195,5 +172,131 @@ function switchImage(direction: string) {
 .title-input:focus::placeholder {
   color: transparent;
   text-shadow: none;
+}
+
+.side:hover,
+.title-input:hover {
+  cursor: url("../assets/images/writing_hand.png"), auto;
+}
+
+@keyframes rotate {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.book {
+  position: absolute;
+
+  top: var(--book-position);
+
+  height: var(--book-front-h);
+  width: var(--book-front-w);
+
+  transform-style: preserve-3d;
+
+  animation: rotate 15s infinite linear;
+}
+
+.side {
+  position: absolute;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.754) inset;
+}
+
+.leather {
+  background-image: url(src/assets/images/leather_cover.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.front,
+.back {
+  width: 100%;
+  height: 100%;
+}
+
+.front {
+  transform: translateZ(var(--book-z));
+  border-radius: 0px 8px 8px 0px;
+}
+
+.back {
+  transform: rotateY(180deg) translateZ(var(--book-z));
+  border-radius: 8px 0px 0px 8px;
+}
+
+.left,
+.right {
+  height: 100%;
+  width: var(--book-side-w);
+}
+
+.right {
+  transform: rotateY(90deg) translateZ(var(--book-rz));
+
+  background-color: #ffffff;
+  background-image: linear-gradient(
+    90deg,
+    transparent 50%,
+    rgba(0, 0, 0, 0.306) 50%
+  );
+  background-size: 3.5px 3.5px;
+}
+
+.left {
+  transform: rotateY(270deg) translateZ(var(--book-z));
+  writing-mode: vertical-rl;
+
+  text-align: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+.top,
+.bottom {
+  height: var(--book-top-h);
+  width: var(--book-top-w);
+
+  background-color: #ffffff;
+  background-image: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.306) 50%);
+  background-size: 3.5px 3.5px;
+}
+
+.top {
+  transform: translateY(-50%) rotateX(90deg);
+}
+
+.bottom {
+  bottom: 0;
+
+  transform: translateY(50%) rotateX(90deg);
+}
+
+@keyframes rotateBack {
+  from {
+    transform: rotateY(-360deg);
+  }
+  to {
+    transform: rotateY(35deg) rotateX(45deg);
+  }
+}
+
+@keyframes bookHover {
+  from {
+    transform: rotateY(35deg) rotateX(45deg);
+  }
+  to {
+    transform: rotateY(5deg) rotateX(5deg);
+  }
+}
+
+.active {
+  animation: rotateBack 0.6s ease-out,
+    bookHover 15s infinite alternate ease-in-out 0.6s;
 }
 </style>
