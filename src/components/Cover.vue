@@ -204,7 +204,7 @@ function switchImage(direction: string) {
 }
 
 .leather {
-  background-image: url(src/assets/images/leather_cover.jpg);
+  background-image: url(../assets/images/leather_cover.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
