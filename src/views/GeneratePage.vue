@@ -19,7 +19,7 @@ import Footer from "../components/Footer.vue";
 
   height: 100dvh;
 
-  perspective: 800px;
+  perspective: var(--book-perspective);
   perspective-origin: 50% calc(50% - 150px);
 }
 </style>

@@ -18,10 +18,11 @@ const helperStore = helper_store();
 :root {
   font-size: 1rem;
 
-  --bg-color: rgb(29, 31, 81);
+  --bg-color: rgb(34, 35, 86);
   --btn-color: rgb(247, 156, 10);
 
   --title-color: rgb(255, 179, 57);
+  --page-clr: rgb(232, 230, 218);
   --title-size: 1.7rem;
 
   --font-UI: "Kanit", sans-serif;
@@ -39,6 +40,8 @@ const helperStore = helper_store();
   --book-rz: 180px;
 
   --book-position: 7vh;
+
+  --book-perspective: 800px;
 }
 
 *,

@@ -12,13 +12,13 @@ const prompt = ref("");
 const imageString = ref("");
 
 const isActive = ref(false);
-const flipPages = ref(false);
+const flipCover = ref(false);
 
 async function createCover(prompt: string, number: number) {
   helperStore.isLoading = true;
   /* Resets the story title if there is one */
   persistedStore.currentStoryTitle = "";
-  const results = await generateImage(prompt, number, false);
+  const results = await generateImage(prompt, number, true);
   /* Returns b64-strings from results */
   helperStore.generatedImagesArray = results!.map((result) => result.b64_json);
 
@@ -41,13 +41,10 @@ function switchImage(direction: string) {
 
 async function startStory(imageString: string, prompt: string) {
   await uploadCover(imageString, prompt);
-  /* Sets the chosen story title */
   persistedStore.currentStoryTitle = prompt;
 
-  setTimeout(() => {
-    flipPages.value = true;
-    helperStore.showCoverControls = false;
-  }, 500);
+  flipCover.value = true;
+  helperStore.showCoverControls = false;
 }
 </script>
 
@@ -69,12 +66,13 @@ async function startStory(imageString: string, prompt: string) {
   </div>
   <div class="book-container">
     <div class="book" @click="isActive = true" :class="{ active: isActive }">
-      <div class="side leather front" :class="{ turnPage: flipPages }">
+      <div class="side leather front" :class="{ turnPage: flipCover }">
         <img
           v-show="imageString"
           :src="imageString"
           :alt="prompt"
           class="generated-cover"
+          @click="flipCover = !flipCover"
         />
         <div class="title-page">
           <textarea
@@ -90,7 +88,14 @@ async function startStory(imageString: string, prompt: string) {
           />
         </div>
       </div>
-      <Page />
+      <Page
+        v-for="(page, index) in helperStore.numberOfPages"
+        :page="page"
+        :index="index"
+      />
+      <div class="last-page">
+        <h3>The end...</h3>
+      </div>
       <div class="side leather back"></div>
       <div class="side leather left">{{ prompt }}</div>
       <div class="side right"></div>
@@ -100,8 +105,8 @@ async function startStory(imageString: string, prompt: string) {
   </div>
   <div class="button-wrapper below">
     <Button
-      v-show="!flipPages"
-      @click="createCover(prompt, 1)"
+      v-show="!flipCover"
+      @click="createCover(prompt, 2)"
       :text="imageString ? 'Generate again' : 'Generate a cover'"
       :disabled="!prompt"
     />
@@ -249,7 +254,8 @@ async function startStory(imageString: string, prompt: string) {
 }
 
 .front,
-.back {
+.back,
+.last-page {
   width: 100%;
   height: 100%;
 }
@@ -260,11 +266,25 @@ async function startStory(imageString: string, prompt: string) {
   border-radius: 0px 4px 4px 0px;
 
   transition: transform 1.3s ease-out;
+
+  z-index: 1;
 }
 
 .back {
   transform: rotateY(180deg) translateZ(var(--book-z));
   border-radius: 4px 0px 0px 4px;
+}
+
+.last-page {
+  position: absolute;
+
+  transform: translateZ(var(--book-z));
+
+  border-radius: 0px 4px 4px 0px;
+
+  background-color: var(--page-clr);
+
+  z-index: -6;
 }
 
 .left,
@@ -323,13 +343,13 @@ async function startStory(imageString: string, prompt: string) {
     transform: rotateY(-180deg);
   }
   to {
-    transform: rotateY(35deg) rotateX(35deg);
+    transform: rotateY(25deg) rotateX(25deg);
   }
 }
 
 @keyframes bookHover {
   from {
-    transform: rotateY(35deg) rotateX(35deg);
+    transform: rotateY(25deg) rotateX(25deg);
   }
   to {
     transform: rotateY(5deg) rotateX(5deg);
@@ -345,6 +365,7 @@ async function startStory(imageString: string, prompt: string) {
   transform-origin: 0% 50%;
   transition: transform 1s ease;
   transform: translateZ(var(--book-z)) rotateY(-180deg);
+  z-index: 1;
 }
 
 .turnPage .generated-cover {
