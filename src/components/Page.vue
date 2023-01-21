@@ -1,47 +1,90 @@
 <script setup lang="ts">
-import { ref, defineProps } from "vue";
+import { ref, computed, unref } from "vue";
 import { helper_store, persisted_store } from "../store/store";
+import Button from "../components/Button.vue";
+import { generateImage, uploadPage } from "../services/API.js";
 
 const props = defineProps({
   page: Number,
   index: Number,
 });
 
+const helperStore = helper_store();
 const persistedStore = persisted_store();
 
 const story = ref("");
-const minimumCharacters = ref(70);
+const minimumCharacters = ref(140);
+
+const imageString = ref("");
 
 const flipPage = ref(false);
+
+const prompt = ref("");
+
+async function generatePage(prompt: string, number: number) {
+  helperStore.isLoading = true;
+
+  const results = await generateImage(prompt, number, false);
+  helperStore.generatedImagesArray = results!.map((result) => result.b64_json);
+
+  imageString.value =
+    helperStore.data_URL_helper + helperStore.generatedImagesArray[0];
+
+  helperStore.showPageControls = true;
+  helperStore.isLoading = false;
+}
+
+const characterCount = computed(() => {
+  const storyLength = unref(story);
+  const minCharacterLength = unref(minimumCharacters);
+  if (storyLength.length >= minCharacterLength) return "✅";
+  return `${story.value.length} / ${minimumCharacters.value}`;
+});
 </script>
 
 <template>
   <div
     class="page-wrapper"
     :class="flipPage ? 'flipForwards' : 'flipBackwards'"
-    :style="`z-index: -${props.page};`"
+    :style="flipPage ? 'z-index: 1;' : `z-index: -${props.page}`"
   >
-    <div class="page" @click="flipPage = !flipPage">
-      <div class="side front">
-        <h2 class="page-title">{{ persistedStore.currentStoryTitle }}</h2>
-        <textarea
-          class="page-input"
-          placeholder="There once was a..."
-          cols="25"
-          rows="5"
-          maxlength="140"
-          spellcheck="false"
-          v-model="story"
-        />
-        <p id="characters">{{ `${story.length} / ${minimumCharacters}` }}</p>
-        <p id="page-number">{{ props.page }}</p>
-      </div>
-      <div class="side back">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Vel corporis
-        consequatur ut harum molestiae laboriosam voluptates sit tempore,
-        laudantium necessitatibus cum, dolor distinctio impedit animi ex culpa
-        facere fugiat ipsum assumenda saepe.
-      </div>
+    <div class="page">
+      <h2 class="page-title">{{ persistedStore.currentStoryTitle }}</h2>
+      <textarea
+        class="page-input"
+        placeholder="There once was a..."
+        cols="25"
+        rows="5"
+        maxlength="220"
+        spellcheck="false"
+        v-model="story"
+      />
+      <p id="characters">Minimum characters: {{ characterCount }}</p>
+      <textarea
+        v-if="story.length >= 140"
+        class="page-input"
+        placeholder="Now write a prompt to create an image to accompany the story..."
+        rows="3"
+        cols="20"
+        maxlength="65"
+        required
+        spellcheck="false"
+        v-model="prompt"
+      />
+      <img
+        v-show="imageString"
+        :src="imageString"
+        :alt="prompt"
+        class="generated-page"
+        @click="flipPage = !flipPage"
+      />
+      <Button
+        text="Generate"
+        secondary
+        :disabled="!prompt"
+        @click="generatePage(prompt, 2)"
+      />
+      <p id="page-number">{{ props.page }}</p>
     </div>
   </div>
 </template>
@@ -51,17 +94,23 @@ const flipPage = ref(false);
   position: absolute;
 
   height: 100%;
-  width: var(--book-top-w);
+  width: 100%;
 
   transform: translateZ(var(--book-z));
 
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.585) inset;
 
   perspective: var(--book-perspective);
+
+  transition: transform 1s ease;
 }
 
 .page {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
   height: 100%;
   width: 100%;
 
@@ -69,32 +118,9 @@ const flipPage = ref(false);
 
   transform-style: preserve-3d;
 
-  transition: transform 1s ease alternate;
-}
-
-.side {
-  position: absolute;
-
-  height: 100%;
-  width: 100%;
-
   background-color: var(--page-clr);
 
   padding: 5%;
-
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.front {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
-
-.back {
-  transform: rotateY(180deg);
 }
 
 .page-title {
@@ -110,11 +136,11 @@ const flipPage = ref(false);
   border: none;
   overflow: hidden;
 
-  transition: all 0.7s;
-
   cursor: url("../assets/images/writing_hand.png"), auto;
 
   width: 100%;
+
+  font-size: 0.8rem;
 }
 
 .page-input:focus {
@@ -128,7 +154,13 @@ const flipPage = ref(false);
 
 #characters {
   font-size: 0.8rem;
-  margin-top: auto;
+  margin-top: 8px;
+  margin-bottom: auto;
+}
+
+.generated-page {
+  height: 100%;
+  width: 100%;
 }
 
 #page-number {
@@ -141,12 +173,10 @@ const flipPage = ref(false);
 .flipForwards {
   transform-origin: 0% 50%;
   transform: translateZ(var(--book-z)) rotateY(-180deg);
-  transition: transform 1s ease;
 }
 
 .flipBackwards {
   transform-origin: 0% 50%;
   transform: translateZ(var(--book-z)) rotateY(0deg);
-  transition: transform 1s ease;
 }
 </style>

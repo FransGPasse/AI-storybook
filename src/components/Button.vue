@@ -62,5 +62,7 @@ button:disabled {
 
 .secondary:disabled {
   cursor: not-allowed;
+  color: rgba(247, 156, 10, 0.621);
+  text-decoration: none;
 }
 </style>

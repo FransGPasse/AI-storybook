@@ -143,7 +143,7 @@ async function startStory(imageString: string, prompt: string) {
   align-items: center;
   justify-content: space-evenly;
 
-  z-index: 1;
+  z-index: 999;
 }
 
 .above {
@@ -162,7 +162,6 @@ async function startStory(imageString: string, prompt: string) {
 
   top: 7.5%;
   left: 7.5%;
-  z-index: -1;
 
   filter: brightness(0.8);
 
@@ -202,6 +201,8 @@ async function startStory(imageString: string, prompt: string) {
 
 .title-input {
   transition: all 0.7s;
+
+  z-index: 1;
 }
 
 .title-input::placeholder {
@@ -266,8 +267,6 @@ async function startStory(imageString: string, prompt: string) {
   border-radius: 0px 4px 4px 0px;
 
   transition: transform 1.3s ease-out;
-
-  z-index: 1;
 }
 
 .back {
@@ -281,10 +280,12 @@ async function startStory(imageString: string, prompt: string) {
   transform: translateZ(var(--book-z));
 
   border-radius: 0px 4px 4px 0px;
-
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.585) inset;
   background-color: var(--page-clr);
 
-  z-index: -6;
+  width: var(--book-top-w);
+
+  z-index: -999;
 }
 
 .left,
@@ -358,18 +359,14 @@ async function startStory(imageString: string, prompt: string) {
 
 .active {
   animation: rotateBack 0.6s ease-out,
-    bookHover 20s infinite alternate ease-in-out 0.6s;
+    bookHover 30s infinite alternate ease-out 0.6s;
 }
 
 .turnPage {
   transform-origin: 0% 50%;
-  transition: transform 1s ease;
   transform: translateZ(var(--book-z)) rotateY(-180deg);
-  z-index: 1;
-}
 
-.turnPage .generated-cover {
-  transition: all 1ms 0.5s alternate;
+  z-index: -1;
 }
 
 .turnPage .title-input {
