@@ -39,6 +39,22 @@ async function uploadCover(b64_string: string, prompt: string) {
   }
 }
 
-async function uploadPage(b64_string: string, prompt: string, text: string) {}
+async function uploadPage(
+  b64_string: string,
+  currentStoryTitle: string,
+  prompt: string,
+  text: string
+) {
+  try {
+    const storageRef = ref(
+      storage,
+      `${auth.currentUser?.email}/${currentStoryTitle}/${prompt}`
+    );
+
+    uploadString(storageRef, b64_string, "data_url");
+  } catch (error) {
+    console.error(error);
+  }
+}
 
 export { generateImage, uploadCover, uploadPage };

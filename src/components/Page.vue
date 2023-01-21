@@ -78,14 +78,24 @@ const characterCount = computed(() => {
         class="generated-page"
         @click="flipPage = !flipPage"
       />
-      <Button
-        text="Generate"
-        secondary
-        :disabled="!prompt"
-        @click="generatePage(prompt, 2)"
-      />
       <p id="page-number">{{ props.page }}</p>
     </div>
+  </div>
+  <div class="button-wrapper">
+    <Button
+      v-show="prompt"
+      @click="generatePage(prompt, 2)"
+      :text="imageString ? 'Generate again' : 'Generate'"
+      :disabled="!prompt"
+    />
+    <Button
+      v-show="helperStore.showPageControls"
+      @click="
+        uploadPage(imageString, persistedStore.currentStoryTitle, prompt, story)
+      "
+      text="Choose this image"
+      :disabled="!imageString"
+    />
   </div>
 </template>
 
@@ -168,6 +178,20 @@ const characterCount = computed(() => {
   margin-left: auto;
   font-family: var(--font-UI);
   font-size: 0.8rem;
+}
+
+.button-wrapper {
+  position: fixed;
+
+  width: 320px;
+  bottom: 10px;
+  left: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+
+  transform: translateZ(var(--book-z));
 }
 
 .flipForwards {
