@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { generationStore } from "./store/store";
+import { helper_store } from "./store/store";
 
-const store = generationStore();
+const helperStore = helper_store();
 </script>
 
 <template>
-  <div v-show="store.isLoading" id="loading">
+  <div v-show="helperStore.isLoading" id="loading">
     <h2>Loading...</h2>
   </div>
   <router-view />
@@ -38,7 +38,7 @@ const store = generationStore();
   --book-z: 60px;
   --book-rz: 180px;
 
-  --book-position: 15%;
+  --book-position: 7vh;
 }
 
 *,
@@ -100,7 +100,23 @@ body {
 
     --book-rz: 280px;
 
-    --book-position: 8%;
+    --book-position: 5.5vh;
+  }
+}
+
+/* Desktop size */
+@media screen and (min-width: 1200px) {
+  :root {
+    --title-size: 2.5rem;
+
+    --book-front-h: 550px;
+    --book-front-w: 400px;
+
+    --book-top-w: 390px;
+
+    --book-rz: 330px;
+
+    --book-position: 4vh;
   }
 }
 </style>

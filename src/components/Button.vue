@@ -24,7 +24,14 @@ button {
   white-space: nowrap;
   transition: all 350ms ease;
   font-size: 0.85rem;
+
+  color: black;
 }
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 .primary {
   border-radius: 999px;
   background-color: var(--btn-color);
@@ -35,7 +42,8 @@ button {
 }
 
 .primary:disabled {
-  cursor: not-allowed;
+  background-color: rgba(247, 156, 10, 0.621);
+  color: rgba(0, 0, 0, 0.462);
 }
 
 .secondary {

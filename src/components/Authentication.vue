@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { userStore } from "../store/store.js";
+import { persisted_store } from "../store/store.js";
 import { auth } from "../firebase/index";
 import {
   createUserWithEmailAndPassword,
@@ -10,7 +10,7 @@ import { useRouter } from "vue-router";
 import Button from "../components/Button.vue";
 
 const router = useRouter();
-const store = userStore();
+const persistedStore = persisted_store();
 const email = ref("");
 const password = ref("");
 const errorMessage = ref();
@@ -20,7 +20,7 @@ const newUser = ref(true);
 async function register(email: string, password: string) {
   try {
     await createUserWithEmailAndPassword(auth, email, password);
-    store.user.email = email;
+    persistedStore.user.email = email;
     router.push("/generate");
   } catch (error: unknown) {
     errorMessage.value = error;
@@ -34,7 +34,7 @@ async function register(email: string, password: string) {
 async function login(email: string, password: string) {
   try {
     await signInWithEmailAndPassword(auth, email, password);
-    store.user.email = email;
+    persistedStore.user.email = email;
     router.push("/generate");
   } catch (error: unknown) {
     errorMessage.value = error;

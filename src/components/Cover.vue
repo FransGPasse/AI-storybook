@@ -1,58 +1,78 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { generateImage, uploadImage } from "../services/API.js";
+import { generateImage, uploadCover } from "../services/API.js";
 import Button from "../components/Button.vue";
-import { generationStore } from "../store/store";
+import Page from "../components/Page.vue";
+import { helper_store, persisted_store } from "../store/store";
 
-const store = generationStore();
+const helperStore = helper_store();
+const persistedStore = persisted_store();
 
 const prompt = ref("");
-const imageURL = ref("");
-const b64_helper = ref("data:image/png;base64,");
+const imageString = ref("");
 
 const isActive = ref(false);
+const flipPages = ref(false);
 
 async function createCover(prompt: string, number: number) {
-  store.isLoading = true;
-  const results = await generateImage(prompt, number, true);
-  store.generatedImagesArray = results!.map((result) => result.b64_json);
+  helperStore.isLoading = true;
+  /* Resets the story title if there is one */
+  persistedStore.currentStoryTitle = "";
+  const results = await generateImage(prompt, number, false);
+  /* Returns b64-strings from results */
+  helperStore.generatedImagesArray = results!.map((result) => result.b64_json);
 
-  imageURL.value = b64_helper.value + store.generatedImagesArray[0];
-  store.isLoading = false;
+  /* Sets current image link */
+  imageString.value =
+    helperStore.data_URL_helper + helperStore.generatedImagesArray[0];
+
+  helperStore.showCoverControls = true;
+  helperStore.isLoading = false;
 }
 
 function switchImage(direction: string) {
-  store.isLoading = true;
-  if (direction === "previous") store.currentArrayValue -= 1;
-  if (direction === "next") store.currentArrayValue += 1;
+  if (direction === "previous") helperStore.currentArrayValue -= 1;
+  if (direction === "next") helperStore.currentArrayValue += 1;
 
-  imageURL.value =
-    b64_helper.value + store.generatedImagesArray[store.currentArrayValue];
-  store.isLoading = false;
+  imageString.value =
+    helperStore.data_URL_helper +
+    helperStore.generatedImagesArray[helperStore.currentArrayValue];
+}
+
+async function startStory(imageString: string, prompt: string) {
+  await uploadCover(imageString, prompt);
+  /* Sets the chosen story title */
+  persistedStore.currentStoryTitle = prompt;
+
+  setTimeout(() => {
+    flipPages.value = true;
+    helperStore.showCoverControls = false;
+  }, 500);
 }
 </script>
 
 <template>
-  <div class="book-container" :class="{ generated: imageURL }">
-    <div class="button-wrapper" v-show="imageURL">
-      <Button
-        text="&larr; Previous"
-        @click="switchImage('previous')"
-        :disabled="store.currentArrayValue === 0"
-      />
-      <Button
-        text="Next &rarr;"
-        @click="switchImage('next')"
-        :disabled="
-          store.generatedImagesArray.length - 1 === store.currentArrayValue
-        "
-      />
-    </div>
+  <div class="button-wrapper above" v-show="helperStore.showCoverControls">
+    <Button
+      text="&larr; Previous"
+      @click="switchImage('previous')"
+      :disabled="helperStore.currentArrayValue === 0"
+    />
+    <Button
+      text="Next &rarr;"
+      @click="switchImage('next')"
+      :disabled="
+        helperStore.generatedImagesArray.length - 1 ===
+        helperStore.currentArrayValue
+      "
+    />
+  </div>
+  <div class="book-container">
     <div class="book" @click="isActive = true" :class="{ active: isActive }">
-      <div class="side leather front">
+      <div class="side leather front" :class="{ turnPage: flipPages }">
         <img
-          v-show="imageURL"
-          :src="imageURL"
+          v-show="imageString"
+          :src="imageString"
           :alt="prompt"
           class="generated-cover"
         />
@@ -64,30 +84,33 @@ function switchImage(direction: string) {
             rows="3"
             cols="20"
             maxlength="65"
+            spellcheck="false"
             required
             v-model="prompt"
           />
         </div>
       </div>
+      <Page />
       <div class="side leather back"></div>
       <div class="side leather left">{{ prompt }}</div>
       <div class="side right"></div>
       <div class="side top"></div>
       <div class="side bottom"></div>
     </div>
-    <div class="button-wrapper">
-      <Button
-        @click="createCover(prompt, 2)"
-        text="Generate a cover"
-        :disabled="!prompt"
-      />
-      <Button
-        v-show="imageURL"
-        @click="uploadImage(imageURL, prompt)"
-        text="Choose this image"
-        :disabled="!imageURL"
-      />
-    </div>
+  </div>
+  <div class="button-wrapper below">
+    <Button
+      v-show="!flipPages"
+      @click="createCover(prompt, 1)"
+      :text="imageString ? 'Generate again' : 'Generate a cover'"
+      :disabled="!prompt"
+    />
+    <Button
+      v-show="helperStore.showCoverControls"
+      @click="startStory(imageString, prompt)"
+      text="Choose this image"
+      :disabled="!imageString"
+    />
   </div>
 </template>
 
@@ -100,36 +123,47 @@ function switchImage(direction: string) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   margin-block: 30px;
 
   width: 100%;
   height: 100%;
 }
 
-.generated {
-  justify-content: space-between;
-}
-
 .button-wrapper {
+  position: fixed;
+
   width: 320px;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+
+  z-index: 1;
+}
+
+.above {
+  top: 20px;
+}
+
+.below {
+  bottom: 50px;
 }
 
 .generated-cover {
   position: absolute;
 
-  height: 100%;
-  width: 100%;
+  height: 85%;
+  width: 85%;
 
-  top: 0;
-  left: 0;
+  top: 7.5%;
+  left: 7.5%;
   z-index: -1;
-  border-radius: 0px 8px 8px 0px;
 
   filter: brightness(0.8);
+
+  outline: 3px solid var(--title-color);
+
+  outline-offset: 0.5px;
 }
 
 .title-page {
@@ -159,6 +193,10 @@ function switchImage(direction: string) {
   overflow: hidden;
 
   text-shadow: black -1px 2px 2px;
+}
+
+.title-input {
+  transition: all 0.7s;
 }
 
 .title-input::placeholder {
@@ -217,13 +255,16 @@ function switchImage(direction: string) {
 }
 
 .front {
+  transform-origin: 0% 50%;
   transform: translateZ(var(--book-z));
-  border-radius: 0px 8px 8px 0px;
+  border-radius: 0px 4px 4px 0px;
+
+  transition: transform 1.3s ease-out;
 }
 
 .back {
   transform: rotateY(180deg) translateZ(var(--book-z));
-  border-radius: 8px 0px 0px 8px;
+  border-radius: 4px 0px 0px 4px;
 }
 
 .left,
@@ -279,16 +320,16 @@ function switchImage(direction: string) {
 
 @keyframes rotateBack {
   from {
-    transform: rotateY(-360deg);
+    transform: rotateY(-180deg);
   }
   to {
-    transform: rotateY(35deg) rotateX(45deg);
+    transform: rotateY(35deg) rotateX(35deg);
   }
 }
 
 @keyframes bookHover {
   from {
-    transform: rotateY(35deg) rotateX(45deg);
+    transform: rotateY(35deg) rotateX(35deg);
   }
   to {
     transform: rotateY(5deg) rotateX(5deg);
@@ -297,6 +338,31 @@ function switchImage(direction: string) {
 
 .active {
   animation: rotateBack 0.6s ease-out,
-    bookHover 15s infinite alternate ease-in-out 0.6s;
+    bookHover 20s infinite alternate ease-in-out 0.6s;
+}
+
+.turnPage {
+  transform-origin: 0% 50%;
+  transition: transform 1s ease;
+  transform: translateZ(var(--book-z)) rotateY(-180deg);
+}
+
+.turnPage .generated-cover {
+  transition: all 1ms 0.5s alternate;
+}
+
+.turnPage .title-input {
+  color: transparent;
+  text-shadow: none;
+  pointer-events: none;
+}
+
+.turnPage:hover {
+  cursor: default;
+}
+
+.turnPage .title-input::placeholder {
+  color: transparent;
+  text-shadow: none;
 }
 </style>

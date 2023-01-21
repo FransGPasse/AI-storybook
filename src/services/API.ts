@@ -26,11 +26,11 @@ async function generateImage(prompt: string, number: number, cover: boolean) {
   }
 }
 
-async function uploadImage(b64_string: string, prompt: string) {
+async function uploadCover(b64_string: string, prompt: string) {
   try {
     const storageRef = ref(
       storage,
-      `stories/${auth.currentUser?.email}/${prompt}`
+      `${auth.currentUser?.email}/${prompt}/cover_image`
     );
 
     uploadString(storageRef, b64_string, "data_url");
@@ -41,4 +41,4 @@ async function uploadImage(b64_string: string, prompt: string) {
 
 async function uploadPage(b64_string: string, prompt: string, text: string) {}
 
-export { generateImage, uploadImage, uploadPage };
+export { generateImage, uploadCover, uploadPage };
