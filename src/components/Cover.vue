@@ -3,10 +3,9 @@ import { ref } from "vue";
 import { generateImage, uploadCover } from "../services/API.js";
 import Button from "../components/Button.vue";
 import Page from "../components/Page.vue";
-import { helper_store, persisted_store } from "../store/store";
+import { helper_store } from "../store/store";
 
 const helperStore = helper_store();
-const persistedStore = persisted_store();
 
 const prompt = ref("");
 const imageString = ref("");
@@ -17,7 +16,8 @@ const flipCover = ref(false);
 async function createCover(prompt: string, number: number) {
   helperStore.isLoading = true;
   /* Resets the story title if there is one */
-  persistedStore.currentStoryTitle = "";
+  helperStore.currentStoryTitle = "";
+
   const results = await generateImage(prompt, number, true);
   /* Returns b64-strings from results */
   helperStore.generatedImagesArray = results!.map((result) => result.b64_json);
@@ -26,6 +26,7 @@ async function createCover(prompt: string, number: number) {
   imageString.value =
     helperStore.data_URL_helper + helperStore.generatedImagesArray[0];
 
+  helperStore.currentStoryTitle = prompt;
   helperStore.showCoverControls = true;
   helperStore.isLoading = false;
 }
@@ -41,7 +42,7 @@ function switchImage(direction: string) {
 
 async function startStory(imageString: string, prompt: string) {
   await uploadCover(imageString, prompt);
-  persistedStore.currentStoryTitle = prompt;
+  helperStore.currentStoryTitle = prompt;
 
   flipCover.value = true;
   helperStore.showCoverControls = false;
@@ -277,7 +278,7 @@ async function startStory(imageString: string, prompt: string) {
 .last-page {
   position: absolute;
 
-  transform: translateZ(var(--book-z));
+  transform: translateZ(calc(var(--book-z) - 1px));
 
   border-radius: 0px 4px 4px 0px;
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.585) inset;

@@ -11,6 +11,7 @@ const helper_store = defineStore("helper_store", () => {
   const numberOfPages = ref(5);
   const generatedImagesArray: any = ref([]);
   const currentArrayValue = ref(0);
+  const currentStoryTitle = ref("");
 
   return {
     data_URL_helper,
@@ -20,6 +21,7 @@ const helper_store = defineStore("helper_store", () => {
     numberOfPages,
     generatedImagesArray,
     currentArrayValue,
+    currentStoryTitle,
   };
 });
 
@@ -31,10 +33,9 @@ const persisted_store = defineStore(
       name: "",
     });
 
-    const currentStoryTitle = ref("");
     const currentPage = ref(0);
 
-    return { user, currentStoryTitle, currentPage };
+    return { user, currentPage };
   },
   /* Persists state through pinia-plugin-persistedstate */
   {

@@ -1,7 +1,7 @@
 import { Configuration, OpenAIApi } from "openai";
 import { ref, uploadString } from "firebase/storage";
-import { storage } from "../firebase/index";
-import { auth } from "../firebase/index";
+import { storage, auth, db } from "../firebase/index";
+import { addDoc, collection } from "firebase/firestore";
 
 const API_KEY = import.meta.env.VITE_OPEN_AI_API_KEY;
 
@@ -43,6 +43,7 @@ async function uploadPage(
   b64_string: string,
   currentStoryTitle: string,
   prompt: string,
+  pageNumber: number,
   text: string
 ) {
   try {
@@ -52,6 +53,14 @@ async function uploadPage(
     );
 
     uploadString(storageRef, b64_string, "data_url");
+
+    addDoc(
+      collection(db, `stories/${auth.currentUser?.email}/${currentStoryTitle}`),
+      {
+        pageNumber: pageNumber,
+        text: text,
+      }
+    );
   } catch (error) {
     console.error(error);
   }

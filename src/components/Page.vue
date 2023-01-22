@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, unref } from "vue";
-import { helper_store, persisted_store } from "../store/store";
-import Button from "../components/Button.vue";
+import { helper_store } from "../store/store";
 import { generateImage, uploadPage } from "../services/API.js";
 
 const props = defineProps({
@@ -10,19 +9,19 @@ const props = defineProps({
 });
 
 const helperStore = helper_store();
-const persistedStore = persisted_store();
-
 const story = ref("");
-const minimumCharacters = ref(140);
 
+const minimumCharacters = ref(140);
+const prompt = ref("");
 const imageString = ref("");
 
 const flipPage = ref(false);
 
-const prompt = ref("");
-
 async function generatePage(prompt: string, number: number) {
   helperStore.isLoading = true;
+
+  /* Resets the image string array */
+  helperStore.currentArrayValue = 0;
 
   const results = await generateImage(prompt, number, false);
   helperStore.generatedImagesArray = results!.map((result) => result.b64_json);
@@ -40,6 +39,28 @@ const characterCount = computed(() => {
   if (storyLength.length >= minCharacterLength) return "✅";
   return `${story.value.length} / ${minimumCharacters.value}`;
 });
+
+function switchImage(direction: string) {
+  if (direction === "previous") helperStore.currentArrayValue -= 1;
+  if (direction === "next") helperStore.currentArrayValue += 1;
+
+  imageString.value =
+    helperStore.data_URL_helper +
+    helperStore.generatedImagesArray[helperStore.currentArrayValue];
+}
+
+async function finishPage(
+  imageString: string,
+  currentStoryTitle: string,
+  prompt: string,
+  pageNumber: number,
+  story: string
+) {
+  await uploadPage(imageString, currentStoryTitle, prompt, pageNumber, story);
+
+  flipPage.value = true;
+  helperStore.showPageControls = false;
+}
 </script>
 
 <template>
@@ -49,10 +70,12 @@ const characterCount = computed(() => {
     :style="flipPage ? 'z-index: 1;' : `z-index: -${props.page}`"
   >
     <div class="page">
-      <h2 class="page-title">{{ persistedStore.currentStoryTitle }}</h2>
+      <h2 class="page-title">{{ helperStore.currentStoryTitle }}</h2>
       <textarea
         class="page-input"
-        placeholder="There once was a..."
+        :placeholder="
+          page === 1 ? ' There once was a...' : 'Continue story here...'
+        "
         cols="25"
         rows="5"
         maxlength="220"
@@ -61,7 +84,7 @@ const characterCount = computed(() => {
       />
       <p id="characters">Minimum characters: {{ characterCount }}</p>
       <textarea
-        v-if="story.length >= 140"
+        v-show="story.length >= 140"
         class="page-input"
         placeholder="Now write a prompt to create an image to accompany the story..."
         rows="3"
@@ -71,31 +94,62 @@ const characterCount = computed(() => {
         spellcheck="false"
         v-model="prompt"
       />
+      <div class="button-wrapper" v-show="helperStore.showPageControls">
+        <button
+          class="page-button"
+          @click="switchImage('previous')"
+          :disabled="helperStore.currentArrayValue === 0"
+        >
+          Previous
+        </button>
+        <button
+          class="page-button"
+          @click="switchImage('next')"
+          :disabled="
+            helperStore.generatedImagesArray.length - 1 ===
+            helperStore.currentArrayValue
+          "
+        >
+          Next
+        </button>
+      </div>
       <img
         v-show="imageString"
         :src="imageString"
         :alt="prompt"
         class="generated-page"
-        @click="flipPage = !flipPage"
       />
       <p id="page-number">{{ props.page }}</p>
+      <div class="button-wrapper">
+        <button
+          v-show="prompt"
+          class="page-button"
+          @click="generatePage(prompt, 2)"
+          :disabled="!prompt"
+        >
+          Generate
+        </button>
+        <button
+          v-show="helperStore.showPageControls"
+          class="page-button"
+          @click="
+            finishPage(
+              imageString,
+              helperStore.currentStoryTitle,
+              prompt,
+              page!,
+              story
+            )
+          "
+          :disabled="!imageString"
+        >
+          Choose image
+        </button>
+      </div>
+      <p id="arrow" v-show="imageString" @click="flipPage = !flipPage">
+        &rarr;
+      </p>
     </div>
-  </div>
-  <div class="button-wrapper">
-    <Button
-      v-show="prompt"
-      @click="generatePage(prompt, 2)"
-      :text="imageString ? 'Generate again' : 'Generate'"
-      :disabled="!prompt"
-    />
-    <Button
-      v-show="helperStore.showPageControls"
-      @click="
-        uploadPage(imageString, persistedStore.currentStoryTitle, prompt, story)
-      "
-      text="Choose this image"
-      :disabled="!imageString"
-    />
   </div>
 </template>
 
@@ -104,8 +158,7 @@ const characterCount = computed(() => {
   position: absolute;
 
   height: 100%;
-  width: 100%;
-
+  width: var(--book-top-w);
   transform: translateZ(var(--book-z));
 
   box-shadow: 0 0 3px rgba(0, 0, 0, 0.585) inset;
@@ -113,6 +166,8 @@ const characterCount = computed(() => {
   perspective: var(--book-perspective);
 
   transition: transform 1s ease;
+
+  font-size: 0.8rem;
 }
 
 .page {
@@ -149,8 +204,6 @@ const characterCount = computed(() => {
   cursor: url("../assets/images/writing_hand.png"), auto;
 
   width: 100%;
-
-  font-size: 0.8rem;
 }
 
 .page-input:focus {
@@ -163,40 +216,76 @@ const characterCount = computed(() => {
 }
 
 #characters {
-  font-size: 0.8rem;
-  margin-top: 8px;
-  margin-bottom: auto;
+  margin-block: 8px;
 }
 
 .generated-page {
-  height: 100%;
-  width: 100%;
+  width: 80%;
 }
 
 #page-number {
-  margin-top: auto;
-  margin-left: auto;
+  position: absolute;
+  bottom: 5px;
+  right: 10px;
   font-family: var(--font-UI);
-  font-size: 0.8rem;
 }
 
 .button-wrapper {
-  position: fixed;
-
-  width: 320px;
-  bottom: 10px;
-  left: 0;
-
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content: center;
 
   transform: translateZ(var(--book-z));
+  margin-top: auto;
+  margin-bottom: 10px;
+}
+
+.page-button {
+  font-size: 0.7rem;
+  font-weight: 200;
+
+  width: 70px;
+
+  background-color: transparent;
+  color: var(--btn-color);
+
+  text-decoration: underline;
+  text-underline-offset: 2px;
+
+  border: none;
+  cursor: pointer;
+
+  white-space: nowrap;
+  transition: all 350ms ease;
+}
+
+.page-button:hover {
+  text-decoration: none;
+}
+
+.page-button:disabled {
+  cursor: not-allowed;
+  color: rgba(247, 156, 10, 0.621);
+  text-decoration: none;
+}
+
+#arrow {
+  translate: 0px 10px;
+  cursor: pointer;
 }
 
 .flipForwards {
   transform-origin: 0% 50%;
   transform: translateZ(var(--book-z)) rotateY(-180deg);
+}
+
+.flipForwards .page > * {
+  visibility: hidden;
+}
+
+.flipForwards .page #arrow {
+  visibility: visible;
+  rotate: 180deg;
 }
 
 .flipBackwards {
