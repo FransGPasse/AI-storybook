@@ -276,7 +276,7 @@ async function startStory(imageString: string, prompt: string) {
 }
 
 .last-page {
-  position: fixed;
+  position: absolute;
 
   transform: translateZ(calc(var(--book-z) - 1px));
 
