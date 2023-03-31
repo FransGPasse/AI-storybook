@@ -13,7 +13,7 @@ const imageString = ref("");
 const isActive = ref(false);
 const flipCover = ref(false);
 
-async function createCover(prompt: string, number: number) {
+async function createCover(prompt: string, number: number): Promise<void> {
   helperStore.isLoading = true;
   /* Resets the story title if there is one */
   helperStore.currentStoryTitle = "";
@@ -31,7 +31,7 @@ async function createCover(prompt: string, number: number) {
   helperStore.isLoading = false;
 }
 
-function switchImage(direction: string) {
+function switchImage(direction: string): void {
   if (direction === "previous") helperStore.currentArrayValue -= 1;
   if (direction === "next") helperStore.currentArrayValue += 1;
 
@@ -40,7 +40,7 @@ function switchImage(direction: string) {
     helperStore.generatedImagesArray[helperStore.currentArrayValue];
 }
 
-async function startStory(imageString: string, prompt: string) {
+async function startStory(imageString: string, prompt: string): Promise<void> {
   await uploadCover(imageString, prompt);
   helperStore.currentStoryTitle = prompt;
 
@@ -87,6 +87,13 @@ async function startStory(imageString: string, prompt: string) {
             required
             v-model="prompt"
           />
+        </div>
+        <div
+          v-show="flipCover"
+          @click="flipCover = !flipCover"
+          class="arrow-wrapper"
+        >
+          <button id="arrow">&rarr;</button>
         </div>
       </div>
       <Page
@@ -268,6 +275,8 @@ async function startStory(imageString: string, prompt: string) {
   border-radius: 0px 4px 4px 0px;
 
   transition: transform 1.3s ease-out;
+
+  isolation: isolate;
 }
 
 .back {
@@ -340,6 +349,22 @@ async function startStory(imageString: string, prompt: string) {
   transform: translateY(50%) rotateX(90deg);
 }
 
+.arrow-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+
+  height: 50%;
+}
+
+#arrow {
+  all: unset;
+  color: var(--btn-color);
+}
+
+/* Animations */
+
 @keyframes rotateBack {
   from {
     transform: rotateY(-180deg);
@@ -358,6 +383,8 @@ async function startStory(imageString: string, prompt: string) {
   }
 }
 
+/* Helper classes */
+
 .active {
   animation: rotateBack 0.6s ease-out,
     bookHover 30s infinite alternate ease-out 0.6s;
@@ -370,18 +397,16 @@ async function startStory(imageString: string, prompt: string) {
   z-index: -1;
 }
 
-.turnPage .title-input {
-  color: transparent;
-  text-shadow: none;
-  pointer-events: none;
-}
-
 .turnPage:hover {
   cursor: default;
 }
 
-.turnPage .title-input::placeholder {
-  color: transparent;
-  text-shadow: none;
+.turnPage > * {
+  visibility: hidden;
+}
+
+.turnPage .arrow-wrapper,
+#arrow {
+  visibility: visible;
 }
 </style>

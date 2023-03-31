@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from "openai";
+import { Configuration, ImagesResponseDataInner, OpenAIApi } from "openai";
 import { ref, uploadString } from "firebase/storage";
 import { storage, auth, db } from "../firebase/index";
 import { addDoc, collection } from "firebase/firestore";
@@ -10,7 +10,7 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-async function generateImage(prompt: string, number: number, cover: boolean) {
+async function generateImage(prompt: string, number: number, cover: boolean): Promise<ImagesResponseDataInner[] | undefined> {
   const imageSize = cover ? "1024x1024" : "512x512";
   try {
     const result = await openai.createImage({
@@ -26,7 +26,7 @@ async function generateImage(prompt: string, number: number, cover: boolean) {
   }
 }
 
-async function uploadCover(b64_string: string, prompt: string) {
+async function uploadCover(b64_string: string, prompt: string): Promise<void> {
   try {
     const storageRef = ref(
       storage,
@@ -45,7 +45,7 @@ async function uploadPage(
   prompt: string,
   pageNumber: number,
   text: string
-) {
+): Promise<void> {
   try {
     const storageRef = ref(
       storage,

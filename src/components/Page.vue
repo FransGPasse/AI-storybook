@@ -17,7 +17,7 @@ const imageString = ref("");
 
 const flipPage = ref(false);
 
-async function generatePage(prompt: string, number: number) {
+async function generatePage(prompt: string, number: number): Promise<void> {
   helperStore.isLoading = true;
 
   /* Resets the image string array */
@@ -33,14 +33,14 @@ async function generatePage(prompt: string, number: number) {
   helperStore.isLoading = false;
 }
 
-const characterCount = computed(() => {
+const characterCount = computed((): string => {
   const storyLength = unref(story);
   const minCharacterLength = unref(minimumCharacters);
   if (storyLength.length >= minCharacterLength) return "✅";
   return `${story.value.length} / ${minimumCharacters.value}`;
 });
 
-function switchImage(direction: string) {
+function switchImage(direction: string): void {
   if (direction === "previous") helperStore.currentArrayValue -= 1;
   if (direction === "next") helperStore.currentArrayValue += 1;
 
@@ -55,7 +55,7 @@ async function finishPage(
   prompt: string,
   pageNumber: number,
   story: string
-) {
+): Promise<void> {
   await uploadPage(imageString, currentStoryTitle, prompt, pageNumber, story);
 
   flipPage.value = true;
@@ -146,9 +146,9 @@ async function finishPage(
           Choose image
         </button>
       </div>
-      <p id="arrow" v-show="imageString" @click="flipPage = !flipPage">
+      <button id="arrow" v-show="imageString" @click="flipPage = !flipPage">
         &rarr;
-      </p>
+      </button>
     </div>
   </div>
 </template>
@@ -270,8 +270,9 @@ async function finishPage(
 }
 
 #arrow {
+  all: unset;
+  color: var(--btn-color);
   translate: 0px 10px;
-  cursor: pointer;
 }
 
 .flipForwards {

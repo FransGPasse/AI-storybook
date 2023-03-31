@@ -8,7 +8,7 @@ import { useRouter } from "vue-router";
 const persistedStore = persisted_store();
 const router = useRouter();
 
-async function signOutUser() {
+async function signOutUser(): Promise<void> {
   try {
     await signOut(auth);
     persistedStore.user.email = "";
