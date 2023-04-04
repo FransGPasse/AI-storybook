@@ -1,16 +1,5 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { auth } from "../firebase/index";
 import Authentication from "../components/Authentication.vue";
-
-const router = useRouter();
-
-onMounted(() => {
-  if (auth.currentUser) {
-    router.push("/generate");
-  }
-});
 </script>
 
 <template>

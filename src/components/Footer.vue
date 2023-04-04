@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { persisted_store } from "../store/store";
 import Button from "./Button.vue";
 import { auth } from "../firebase/index";
 import { signOut } from "@firebase/auth";
 import { useRouter } from "vue-router";
 
-const persistedStore = persisted_store();
 const router = useRouter();
+const currentUser = auth.currentUser;
 
 async function signOutUser(): Promise<void> {
   try {
     await signOut(auth);
-    persistedStore.user.email = "";
     router.push("/");
   } catch (error: unknown) {
     console.error(error);
@@ -21,7 +19,8 @@ async function signOutUser(): Promise<void> {
 
 <template>
   <div class="footer">
-    <p>Logged in as {{ persistedStore.user.email }}</p>
+    <p>Logged in as {{ currentUser?.email }}</p>
+    <Button text="My books" secondary @click="router.push('/my-books')" />
     <Button text="Log out" secondary @click="signOutUser" />
   </div>
 </template>

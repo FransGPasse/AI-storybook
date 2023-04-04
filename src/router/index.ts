@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import AuthenticationPage from "../views/AuthenticationPage.vue";
 import HomePage from "../views/HomePage.vue";
 import GeneratePage from "../views/GeneratePage.vue";
+import MyBooksPage from "../views/MyBooksPage.vue";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 
@@ -22,6 +23,12 @@ const routes = [
     component: GeneratePage,
     meta: { requiresAuth: true },
   },
+  {
+    path: "/my-books",
+    name: "MyBooks",
+    component: MyBooksPage,
+    meta: { requiresAuth: true },
+  },
 ];
 
 const router = createRouter({
@@ -30,7 +37,7 @@ const router = createRouter({
 });
 
 /* Tries to get the current user and resolve, otherwise reject */
-function getCurrentUser() {
+async function getCurrentUser() {
   return new Promise((resolve, reject) => {
     const removeListener = onAuthStateChanged(
       auth,
@@ -46,10 +53,9 @@ function getCurrentUser() {
 /* Checks all routes to see if user is authorized and logged in, otherwise redirect to auth-page */
 router.beforeEach(async (to) => {
   if (to.meta.requiresAuth && !auth.currentUser) {
-    if (await getCurrentUser()) {
+    if (!(await getCurrentUser())) {
       return {
         path: "/authenticate",
-        query: { redirect: to.fullPath },
       };
     }
   }

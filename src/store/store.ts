@@ -28,14 +28,9 @@ const helper_store = defineStore("helper_store", () => {
 const persisted_store = defineStore(
   "persisted_store",
   () => {
-    const user = ref({
-      email: "",
-      name: "",
-    });
-
     const currentPage = ref(0);
 
-    return { user, currentPage };
+    return { currentPage };
   },
   /* Persists state through pinia-plugin-persistedstate */
   {
