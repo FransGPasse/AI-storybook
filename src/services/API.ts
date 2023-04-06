@@ -10,7 +10,11 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-async function generateImage(prompt: string, number: number, cover: boolean): Promise<ImagesResponseDataInner[] | undefined> {
+async function generateImage(
+  prompt: string,
+  number: number,
+  cover: boolean
+): Promise<ImagesResponseDataInner[] | undefined> {
   const imageSize = cover ? "1024x1024" : "512x512";
   try {
     const result = await openai.createImage({
@@ -32,8 +36,10 @@ async function uploadCover(b64_string: string, prompt: string): Promise<void> {
       storage,
       `${auth.currentUser?.email}/${prompt}/cover_image`
     );
-
-    uploadString(storageRef, b64_string, "data_url");
+    await uploadString(storageRef, b64_string, "data_url");
+    await addDoc(collection(db, `users/${auth.currentUser?.email}/stories`), {
+      title: `${prompt}`,
+    });
   } catch (error) {
     console.error(error);
   }
@@ -54,13 +60,10 @@ async function uploadPage(
 
     uploadString(storageRef, b64_string, "data_url");
 
-    addDoc(
-      collection(db, `stories/${auth.currentUser?.email}/${currentStoryTitle}`),
-      {
-        pageNumber: pageNumber,
-        text: text,
-      }
-    );
+    addDoc(collection(db, `${auth.currentUser?.email}/${currentStoryTitle}`), {
+      pageNumber: pageNumber,
+      text: text,
+    });
   } catch (error) {
     console.error(error);
   }

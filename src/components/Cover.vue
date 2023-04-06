@@ -12,6 +12,7 @@ const imageString = ref("");
 
 const isActive = ref(false);
 const flipCover = ref(false);
+const hasFlipped = ref(false);
 
 async function createCover(prompt: string, number: number): Promise<void> {
   helperStore.isLoading = true;
@@ -66,14 +67,18 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
     />
   </div>
   <div class="book-container">
-    <div class="book" @click="isActive = true" :class="{ active: isActive }">
+    <div
+      class="book"
+      @click="isActive = true"
+      :class="{ active: isActive, finishedCover: hasFlipped && !flipCover }"
+    >
       <div class="side leather front" :class="{ turnPage: flipCover }">
         <img
           v-show="imageString"
           :src="imageString"
           :alt="prompt"
           class="generated-cover"
-          @click="flipCover = !flipCover"
+          @click="(flipCover = !flipCover), (hasFlipped = true)"
         />
         <div class="title-page">
           <textarea
@@ -98,8 +103,8 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
       </div>
       <Page
         v-for="(page, index) in helperStore.numberOfPages"
-        :page="page"
-        :index="index"
+        :page="index + 1"
+        :key="index"
       />
       <div class="last-page">
         <h3>The end...</h3>
@@ -231,12 +236,6 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
   cursor: url("../assets/images/writing_hand.png"), auto;
 }
 
-@keyframes rotate {
-  to {
-    transform: rotateY(360deg);
-  }
-}
-
 .book {
   position: absolute;
 
@@ -365,29 +364,57 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
 
 /* Animations */
 
+@keyframes rotate {
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
 @keyframes rotateBack {
   from {
     transform: rotateY(-180deg);
   }
   to {
-    transform: rotateY(25deg) rotateX(25deg);
+    transform: rotateY(20deg) rotateX(20deg);
   }
 }
 
 @keyframes bookHover {
   from {
-    transform: rotateY(25deg) rotateX(25deg);
+    transform: rotateY(20deg) rotateX(20deg);
   }
   to {
     transform: rotateY(5deg) rotateX(5deg);
   }
 }
 
-/* Helper classes */
+@keyframes hiding {
+  0% {
+    opacity: 1;
+  }
 
+  49.9% {
+    opacity: 1;
+  }
+
+  50% {
+    visibility: hidden;
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Helper classes */
 .active {
   animation: rotateBack 0.6s ease-out,
     bookHover 30s infinite alternate ease-out 0.6s;
+}
+
+.finishedCover {
+  animation: bookHover 30s infinite reverse alternate ease-out;
 }
 
 .turnPage {
@@ -398,15 +425,15 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
 }
 
 .turnPage:hover {
-  cursor: default;
+  cursor: pointer;
 }
 
 .turnPage > * {
-  visibility: hidden;
+  animation: hiding 0.9s forwards ease-out;
 }
 
 .turnPage .arrow-wrapper,
 #arrow {
-  visibility: visible;
+  animation: hiding 0.9s forwards ease-out reverse;
 }
 </style>

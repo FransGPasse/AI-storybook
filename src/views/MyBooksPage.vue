@@ -5,10 +5,11 @@ import { collection, getDocs, query } from "firebase/firestore";
 
 onMounted(async () => {
   const userId = auth.currentUser?.uid;
-  const querySnapshot = await getDocs(collection(db, "stories"));
-
+  const querySnapshot = await getDocs(
+    collection(db, `${auth.currentUser?.email}`)
+  );
   querySnapshot.forEach((doc) => {
-    console.log("doc", doc.data);
+    console.log("doc.", doc);
   });
 });
 </script>

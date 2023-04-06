@@ -1,6 +1,14 @@
 <script setup lang="ts">
+import { onBeforeMount } from "vue";
+import { helper_store } from "../store/store";
 import Cover from "../components/Cover.vue";
 import Footer from "../components/Footer.vue";
+
+const helperStore = helper_store();
+
+onBeforeMount(() => {
+  helperStore.currentArrayValue = 0;
+});
 </script>
 
 <template>
@@ -21,5 +29,7 @@ import Footer from "../components/Footer.vue";
 
   perspective: var(--book-perspective);
   perspective-origin: 50% calc(50% - 150px);
+
+  overflow: hidden;
 }
 </style>

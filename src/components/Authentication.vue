@@ -15,7 +15,7 @@ const errorMessage = ref();
 const newUser = ref(true);
 
 /* Sign up user to Firebase using the email and password ref. */
-async function register(email: string, password: string) {
+async function register(email: string, password: string): Promise<void> {
   try {
     await createUserWithEmailAndPassword(auth, email, password);
     router.push("/generate");
@@ -28,7 +28,7 @@ async function register(email: string, password: string) {
 }
 
 /* Log in user to Firebase using the email and password ref. */
-async function login(email: string, password: string) {
+async function login(email: string, password: string): Promise<void> {
   try {
     await signInWithEmailAndPassword(auth, email, password);
     router.push("/generate");
