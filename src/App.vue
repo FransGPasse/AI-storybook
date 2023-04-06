@@ -21,7 +21,7 @@ const helperStore = helper_store();
   --bg-color: rgb(34, 35, 86);
   --btn-color: rgb(247, 156, 10);
 
-  --title-color: rgb(255, 179, 57);
+  --text-color: rgb(255, 179, 57);
   --page-clr: rgb(232, 230, 218);
   --title-size: 1.7rem;
 
@@ -84,7 +84,7 @@ body {
 }
 
 #loading > h2 {
-  color: var(--title-color);
+  color: var(--text-color);
 
   font-size: 2.5rem;
 

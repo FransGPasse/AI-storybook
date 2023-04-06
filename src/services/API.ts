@@ -1,7 +1,13 @@
 import { Configuration, ImagesResponseDataInner, OpenAIApi } from "openai";
 import { ref, uploadString } from "firebase/storage";
 import { storage, auth, db } from "../firebase/index";
-import { addDoc, collection } from "firebase/firestore";
+import {
+  DocumentData,
+  QuerySnapshot,
+  addDoc,
+  collection,
+  getDocs,
+} from "firebase/firestore";
 
 const API_KEY = import.meta.env.VITE_OPEN_AI_API_KEY;
 
@@ -69,4 +75,16 @@ async function uploadPage(
   }
 }
 
-export { generateImage, uploadCover, uploadPage };
+async function getUserBooks(): Promise<DocumentData[] | undefined> {
+  try {
+    const data = await getDocs(
+      collection(db, `users/${auth.currentUser?.email}/stories`)
+    );
+
+    return data.docs.map((book) => book.data());
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export { generateImage, uploadCover, uploadPage, getUserBooks };

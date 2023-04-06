@@ -178,7 +178,7 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
 
   filter: brightness(0.8);
 
-  outline: 3px solid var(--title-color);
+  outline: 3px solid var(--text-color);
 
   outline-offset: 0.5px;
 }
@@ -219,7 +219,7 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
 }
 
 .title-input::placeholder {
-  color: var(--title-color);
+  color: var(--text-color);
 }
 
 .title-input:focus {

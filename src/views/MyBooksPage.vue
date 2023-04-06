@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { auth, db, storage } from "../firebase/index";
-import { collection, getDocs, query } from "firebase/firestore";
+import { onBeforeMount, ref } from "vue";
+import { getUserBooks } from "../services/API.js";
+import { IBook } from "../models/interfaces";
+import { DocumentData } from "@firebase/firestore";
 
-onMounted(async () => {
-  const userId = auth.currentUser?.uid;
-  const querySnapshot = await getDocs(
-    collection(db, `${auth.currentUser?.email}`)
-  );
-  querySnapshot.forEach((doc) => {
-    console.log("doc.", doc);
-  });
+const books = ref<DocumentData[] | undefined>([]);
+
+onBeforeMount(async () => {
+  books.value = await getUserBooks();
 });
 </script>
 
 <template>
-  <div>Hej hej</div>
+  <h2>All your books!</h2>
+  <div v-for="(book, index) in books" :key="index">
+    <p>{{ book.title }}</p>
+  </div>
 </template>
 
 <style scoped></style>
