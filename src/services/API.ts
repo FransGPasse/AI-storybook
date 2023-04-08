@@ -90,19 +90,19 @@ async function uploadPage(
   }
 }
 
-async function getUserTexts(): Promise<DocumentData[] | undefined> {
+async function getUserBooks(): Promise<DocumentData[] | undefined> {
   try {
     const colRef = collection(db, `users/${auth.currentUser?.email}/stories`);
 
     const data = await getDocs(colRef);
 
-    return data.docs.map((book) => book.data());
+    return data.docs.map((book) => ({ id: book.id, title: book.data().title }));
   } catch (error) {
     console.error(error);
   }
 }
 
-async function getUserPictures(): Promise<ArrayBuffer | undefined> {
+async function getUserBook(id: string): Promise<ArrayBuffer | undefined> {
   try {
     const storageRef = ref(storage, `${auth.currentUser?.email}`);
 
@@ -112,10 +112,4 @@ async function getUserPictures(): Promise<ArrayBuffer | undefined> {
   }
 }
 
-export {
-  generateImage,
-  uploadCover,
-  uploadPage,
-  getUserTexts,
-  getUserPictures,
-};
+export { generateImage, uploadCover, uploadPage, getUserBooks, getUserBook };

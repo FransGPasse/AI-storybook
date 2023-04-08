@@ -1,23 +1,41 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
-import { getUserTexts, getUserPictures } from "../services/API.js";
-import { IBook } from "../models/interfaces";
+import { getUserBooks } from "../services/API.js";
 import { DocumentData } from "@firebase/firestore";
+import { useRouter } from "vue-router";
+import Button from "../components/Button.vue";
+import { helper_store } from "../store/store";
+
+const router = useRouter();
+const helperStore = helper_store();
 
 const books = ref<DocumentData[] | undefined>([]);
-const pictures = ref<ArrayBuffer | undefined>();
 
 onBeforeMount(async () => {
-  books.value = await getUserTexts();
-  pictures.value = await getUserPictures();
+  helperStore.isLoading = true;
+  books.value = await getUserBooks();
+  helperStore.isLoading = false;
 });
 </script>
 
 <template>
-  <h2>All your books!</h2>
-  <div v-for="(book, index) in books" :key="index">
-    <p>{{ book.title }}</p>
-  </div>
+  <section class="page-wrapper">
+    <h2>All your books!</h2>
+    <div v-for="(book, index) in books" :key="index">
+      <Button
+        :text="`${book.title}`"
+        secondary
+        @click="router.push(`books/${book.id}`)"
+      />
+    </div>
+  </section>
 </template>
 
-<style scoped></style>
+<style scoped>
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+</style>

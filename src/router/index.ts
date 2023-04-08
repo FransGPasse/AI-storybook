@@ -3,10 +3,17 @@ import AuthenticationPage from "../views/AuthenticationPage.vue";
 import HomePage from "../views/HomePage.vue";
 import GeneratePage from "../views/GeneratePage.vue";
 import MyBooksPage from "../views/MyBooksPage.vue";
+import MyBookPage from "../views/MyBookPage.vue";
+import NotFoundPage from "../views/NotFoundPage.vue";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 
 const routes = [
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFoundPage",
+    component: NotFoundPage,
+  },
   {
     path: "/",
     name: "HomePage",
@@ -19,14 +26,20 @@ const routes = [
   },
   {
     path: "/generate",
-    name: "Generate",
+    name: "GeneratePage",
     component: GeneratePage,
     meta: { requiresAuth: true },
   },
   {
-    path: "/my-books",
-    name: "MyBooks",
+    path: "/books",
+    name: "MyBooksPage",
     component: MyBooksPage,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/books/:id",
+    name: "MyBookPage",
+    component: MyBookPage,
     meta: { requiresAuth: true },
   },
 ];

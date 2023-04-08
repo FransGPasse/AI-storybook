@@ -57,7 +57,7 @@ button:disabled {
 }
 
 .secondary:hover {
-  text-decoration: none;
+  text-underline-offset: 2px;
 }
 
 .secondary:disabled {
