@@ -1,26 +1,49 @@
 <script setup lang="ts">
-import { onBeforeMount, onMounted, ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 import { getUserBook } from "../services/API.js";
 import { IBook } from "../models/interfaces";
 import { DocumentData } from "@firebase/firestore";
-import { useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import { helper_store } from "../store/store";
 
-const router = useRouter();
+const route = useRoute();
 const helperStore = helper_store();
 
-const book = ref<ArrayBuffer | undefined>();
+const book = ref<DocumentData | undefined>();
 
-onMounted(async function (): Promise<void> {
-  if (this.$route.params.id) {
-    book.value = await getUserBook(this.$route.params.id);
-  }
-  console.log("book.value", book.value);
+onBeforeMount(async (): Promise<void> => {
+  book.value = await getUserBook(route.params.id);
 });
 </script>
 
 <template>
-  <div>Hej hej</div>
+  <div class="page-wrapper">
+    <div v-if="book" class="book-wrapper">
+      <h1>{{ book.title }}</h1>
+      <div v-for="page in book.pages">
+        <p>Page {{ page.pageNumber }}: {{ page.text }}</p>
+      </div>
+    </div>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.page-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  height: 100dvh;
+
+  padding: 15px;
+}
+
+.book-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+
+  height: 50%;
+}
+</style>

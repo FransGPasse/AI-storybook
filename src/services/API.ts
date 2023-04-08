@@ -4,6 +4,7 @@ import { storage, auth, db } from "../firebase/index";
 import {
   addDoc,
   collection,
+  getDoc,
   getDocs,
   doc,
   arrayUnion,
@@ -102,11 +103,17 @@ async function getUserBooks(): Promise<DocumentData[] | undefined> {
   }
 }
 
-async function getUserBook(id: string): Promise<ArrayBuffer | undefined> {
+async function getUserBook(
+  id: string | string[]
+): Promise<DocumentData | undefined> {
   try {
-    const storageRef = ref(storage, `${auth.currentUser?.email}`);
+    const docRef = doc(db, `users/${auth.currentUser?.email}/stories`, `${id}`);
 
-    return await getBytes(storageRef);
+    return (await getDoc(docRef)).data();
+
+    /*     const storageRef = ref(storage, `${auth.currentUser?.email}`);
+
+    await getBytes(storageRef); */
   } catch (error) {
     console.error(error);
   }
