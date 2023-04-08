@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
 import { getUserBook } from "../services/API.js";
-import { IBook } from "../models/interfaces";
 import { DocumentData } from "@firebase/firestore";
 import { useRoute } from "vue-router";
 import { helper_store } from "../store/store";
@@ -12,7 +11,9 @@ const helperStore = helper_store();
 const book = ref<DocumentData | undefined>();
 
 onBeforeMount(async (): Promise<void> => {
+  helperStore.isLoading = true;
   book.value = await getUserBook(route.params.id);
+  helperStore.isLoading = false;
 });
 </script>
 

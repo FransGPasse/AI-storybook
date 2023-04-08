@@ -1,16 +1,24 @@
 import { Configuration, ImagesResponseDataInner, OpenAIApi } from "openai";
-import { ref, uploadString, getBytes } from "firebase/storage";
 import { storage, auth, db } from "../firebase/index";
 import {
-  addDoc,
+  ref,
+  uploadString,
+  listAll,
+  getDownloadURL,
+  StorageReference,
+} from "firebase/storage";
+import {
+  doc,
   collection,
+  addDoc,
   getDoc,
   getDocs,
-  doc,
-  arrayUnion,
   updateDoc,
+  arrayUnion,
   DocumentData,
 } from "firebase/firestore";
+
+import { IBook } from "../models/interfaces";
 
 const API_KEY = import.meta.env.VITE_OPEN_AI_API_KEY;
 
@@ -44,15 +52,17 @@ async function uploadCover(
   prompt: string
 ): Promise<string | undefined> {
   try {
-    const coverRef = ref(storage, `${auth.currentUser?.email}/${prompt}/cover`);
-    await uploadString(coverRef, b64_string, "data_url");
-
     const colRef = collection(db, `users/${auth.currentUser?.email}/stories`);
-
     const docRef = await addDoc(colRef, {
       title: prompt,
       pages: [],
     });
+
+    const coverRef = ref(
+      storage,
+      `${auth.currentUser?.email}/${docRef.id}/${prompt}`
+    );
+    await uploadString(coverRef, b64_string, "data_url");
 
     return docRef.id;
   } catch (error) {
@@ -71,7 +81,7 @@ async function uploadPage(
   try {
     const storageRef = ref(
       storage,
-      `${auth.currentUser?.email}/${currentStoryTitle}/${prompt}`
+      `${auth.currentUser?.email}/${docRef}/${prompt.toLowerCase()}`
     );
 
     uploadString(storageRef, b64_string, "data_url");
@@ -103,17 +113,32 @@ async function getUserBooks(): Promise<DocumentData[] | undefined> {
   }
 }
 
+async function fetchImageLinks(
+  storageRef: StorageReference
+): Promise<string[] | undefined> {
+  try {
+    const res = await listAll(storageRef);
+    const promises = res.items.map((imageRef) => getDownloadURL(imageRef));
+    const urls = await Promise.all(promises);
+    return urls;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 async function getUserBook(
   id: string | string[]
 ): Promise<DocumentData | undefined> {
   try {
+    const storageRef = ref(storage, `${auth.currentUser?.email}/${id}`);
+
+    const links = await fetchImageLinks(storageRef);
+
+    console.log("links", links);
+
     const docRef = doc(db, `users/${auth.currentUser?.email}/stories`, `${id}`);
 
     return (await getDoc(docRef)).data();
-
-    /*     const storageRef = ref(storage, `${auth.currentUser?.email}`);
-
-    await getBytes(storageRef); */
   } catch (error) {
     console.error(error);
   }
