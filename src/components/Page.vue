@@ -53,10 +53,18 @@ async function finishPage(
   imageString: string,
   currentStoryTitle: string,
   prompt: string,
+  docRef: string,
   pageNumber: number,
   story: string
 ): Promise<void> {
-  await uploadPage(imageString, currentStoryTitle, prompt, pageNumber, story);
+  await uploadPage(
+    imageString,
+    currentStoryTitle,
+    prompt,
+    docRef,
+    pageNumber,
+    story
+  );
 
   flipPage.value = true;
   helperStore.showPageControls = false;
@@ -137,6 +145,7 @@ async function finishPage(
               imageString,
               helperStore.currentStoryTitle,
               prompt,
+              helperStore.docRef,
               page!,
               story
             )

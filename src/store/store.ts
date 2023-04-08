@@ -12,6 +12,7 @@ const helper_store = defineStore("helper_store", () => {
   const generatedImagesArray: any = ref([]);
   const currentArrayValue = ref(0);
   const currentStoryTitle = ref("");
+  const docRef = ref("");
 
   return {
     data_URL_helper,
@@ -22,6 +23,7 @@ const helper_store = defineStore("helper_store", () => {
     generatedImagesArray,
     currentArrayValue,
     currentStoryTitle,
+    docRef,
   };
 });
 

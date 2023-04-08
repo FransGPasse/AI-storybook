@@ -42,7 +42,12 @@ function switchImage(direction: string): void {
 }
 
 async function startStory(imageString: string, prompt: string): Promise<void> {
-  await uploadCover(imageString, prompt);
+  const docRef = await uploadCover(imageString, prompt);
+
+  if (docRef) {
+    helperStore.docRef = docRef;
+  }
+
   helperStore.currentStoryTitle = prompt;
 
   flipCover.value = true;
