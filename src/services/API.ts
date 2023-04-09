@@ -134,11 +134,11 @@ async function getUserBook(
 
     const links = await fetchImageLinks(storageRef);
 
-    console.log("links", links);
-
     const docRef = doc(db, `users/${auth.currentUser?.email}/stories`, `${id}`);
 
-    return (await getDoc(docRef)).data();
+    const document = (await getDoc(docRef)).data();
+
+    return { links, document };
   } catch (error) {
     console.error(error);
   }

@@ -13,6 +13,8 @@ const book = ref<DocumentData | undefined>();
 onBeforeMount(async (): Promise<void> => {
   helperStore.isLoading = true;
   book.value = await getUserBook(route.params.id);
+
+  console.log("book.value", book.value);
   helperStore.isLoading = false;
 });
 </script>
@@ -20,8 +22,9 @@ onBeforeMount(async (): Promise<void> => {
 <template>
   <div class="page-wrapper">
     <div v-if="book" class="book-wrapper">
-      <h1>{{ book.title }}</h1>
-      <div v-for="page in book.pages">
+      <h1>{{ book.document.title }}</h1>
+      <img v-for="link in book.links" :src="link" />
+      <div v-for="page in book.document.pages">
         <p>Page {{ page.pageNumber }}: {{ page.text }}</p>
       </div>
     </div>
