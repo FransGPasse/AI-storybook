@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { onBeforeMount, ref } from "vue";
 import { getUserBook } from "../services/API.js";
-import { DocumentData } from "@firebase/firestore";
 import { useRoute } from "vue-router";
 import { helper_store } from "../store/store";
+import FinishedCover from "../components/FinishedCover.vue";
+import { IBook } from "../models/interfaces";
 
 const route = useRoute();
 const helperStore = helper_store();
 
-const book = ref<DocumentData | undefined>({});
+const book = ref<IBook | undefined>();
 
 onBeforeMount(async (): Promise<void> => {
   helperStore.isLoading = true;
@@ -18,31 +19,27 @@ onBeforeMount(async (): Promise<void> => {
 </script>
 
 <template>
-  <div class="page-wrapper">
-    <div v-if="book" class="book-wrapper">
-      <h1>{{ book.title }}</h1>
-      <img :src="book.coverImg" />
-      <div v-for="page in book.pages">
-        <img :src="page.image" />
-        <p>Page {{ page.pageNumber }}: {{ page.text }}</p>
-      </div>
-    </div>
+  <div v-if="book" class="my-book-page">
+    <FinishedCover
+      :title="book.title"
+      :cover-img="book.coverImg"
+      :pages="book.pages"
+    ></FinishedCover>
   </div>
 </template>
 
 <style scoped>
-.page-wrapper {
+.my-book-page {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  padding: 15px;
-}
+  height: 100dvh;
 
-.book-wrapper {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-evenly;
+  perspective: var(--book-perspective);
+  perspective-origin: 50% calc(50% - 150px);
+
+  overflow: hidden;
 }
 </style>

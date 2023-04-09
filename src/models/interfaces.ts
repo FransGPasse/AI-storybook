@@ -1,8 +1,10 @@
 export interface IBook {
   title: string;
   pages: IPage[];
+  coverImg: string;
 }
-interface IPage {
+export interface IPage {
   pageNumber: number;
   text: string;
+  image: string;
 }

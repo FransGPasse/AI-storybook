@@ -11,6 +11,7 @@ import {
   arrayUnion,
   DocumentData,
 } from "firebase/firestore";
+import { IBook } from "../models/interfaces";
 
 const API_KEY = import.meta.env.VITE_OPEN_AI_API_KEY;
 
@@ -120,13 +121,11 @@ async function getUserBooks(): Promise<DocumentData[] | undefined> {
   }
 }
 
-async function getUserBook(
-  id: string | string[]
-): Promise<DocumentData | undefined> {
+async function getUserBook(id: string | string[]): Promise<IBook | undefined> {
   try {
     const docRef = doc(db, `users/${auth.currentUser?.email}/stories`, `${id}`);
     const book = (await getDoc(docRef)).data();
-    return book;
+    return book as IBook;
   } catch (error) {
     console.error(error);
   }
