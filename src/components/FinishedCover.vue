@@ -2,13 +2,9 @@
 import { ref } from "vue";
 import Button from "../components/Button.vue";
 import FinishedPage from "../components/FinishedPage.vue";
-import { helper_store } from "../store/store";
 import { IPage } from "../models/interfaces";
 
-const helperStore = helper_store();
-
 const prompt = ref("");
-const imageString = ref("");
 
 const isActive = ref(false);
 const flipCover = ref(false);
@@ -32,24 +28,13 @@ const props = defineProps<IBook>();
     >
       <div class="side leather front" :class="{ turnPage: flipCover }">
         <img
-          v-show="imageString"
-          :src="imageString"
-          :alt="prompt"
+          :src="props.coverImg"
+          :alt="props.coverImg"
           class="generated-cover"
           @click="(flipCover = !flipCover), (hasFlipped = true)"
         />
         <div class="title-page">
-          <textarea
-            class="title-input"
-            placeholder="Give me a title"
-            wrap="hard"
-            rows="3"
-            cols="20"
-            maxlength="65"
-            spellcheck="false"
-            required
-            v-model="prompt"
-          />
+          <h2 class="title">{{ props.title }}</h2>
         </div>
         <div
           v-show="flipCover"
@@ -61,8 +46,8 @@ const props = defineProps<IBook>();
       </div>
       <FinishedPage
         v-for="(page, index) in props.pages"
-        :page="index + 1"
         :key="index"
+        :book-title="props.title"
         :text="page.text"
         :image="page.image"
         :page-number="page.pageNumber"
@@ -106,14 +91,6 @@ const props = defineProps<IBook>();
   z-index: 999;
 }
 
-.above {
-  top: 20px;
-}
-
-.below {
-  bottom: 50px;
-}
-
 .generated-cover {
   position: absolute;
 
@@ -138,7 +115,7 @@ const props = defineProps<IBook>();
   justify-content: flex-start;
 }
 
-.title-input,
+.title,
 .left {
   color: rgb(255, 188, 18);
   background-color: transparent;
@@ -159,28 +136,13 @@ const props = defineProps<IBook>();
   text-shadow: black -1px 2px 2px;
 }
 
-.title-input {
-  transition: all 0.7s;
-
+.title {
   z-index: 1;
 }
 
-.title-input::placeholder {
-  color: var(--text-color);
-}
-
-.title-input:focus {
-  outline: none;
-}
-
-.title-input:focus::placeholder {
-  color: transparent;
-  text-shadow: none;
-}
-
 .side:hover,
-.title-input:hover {
-  cursor: url("../assets/images/writing_hand.png"), auto;
+.title:hover {
+  cursor: pointer;
 }
 
 .book {
@@ -232,6 +194,10 @@ const props = defineProps<IBook>();
 
 .last-page {
   position: absolute;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   transform: translateZ(calc(var(--book-z) - 1px));
 

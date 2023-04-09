@@ -1,20 +1,13 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { helper_store } from "../store/store";
-import { IPage } from "../models/interfaces";
 
 interface IPage {
+  bookTitle: string;
   pageNumber: number;
   text: string;
   image: string;
 }
-
 const props = defineProps<IPage>();
-
-const helperStore = helper_store();
-
-const prompt = ref("");
-const imageString = ref("");
 
 const flipPage = ref(false);
 </script>
@@ -26,16 +19,11 @@ const flipPage = ref(false);
     :style="flipPage ? 'z-index: 1;' : `z-index: -${props.pageNumber}`"
   >
     <div class="page">
-      <h2 class="page-title">{{ helperStore.currentStoryTitle }}</h2>
-      <p>{{ props.text }}</p>
-      <img
-        v-show="imageString"
-        :src="imageString"
-        :alt="prompt"
-        class="generated-page"
-      />
+      <h2 class="page-title">{{ props.bookTitle }}</h2>
+      <p class="page-text">{{ props.text }}</p>
+      <img v-show="props.image" :src="props.image" class="image" />
       <p id="page-number">{{ props.pageNumber }}</p>
-      <button id="arrow" v-show="imageString" @click="flipPage = !flipPage">
+      <button id="arrow" v-show="props.image" @click="flipPage = !flipPage">
         &rarr;
       </button>
     </div>
@@ -83,33 +71,19 @@ const flipPage = ref(false);
   text-align: center;
 }
 
-.page-input {
-  resize: none;
-
-  background-color: transparent;
-  border: none;
-  overflow: hidden;
-
-  cursor: url("../assets/images/writing_hand.png"), auto;
-
-  width: 100%;
-}
-
-.page-input:focus {
-  outline: none;
-}
-
-.page-input:focus::placeholder {
-  color: transparent;
-  text-shadow: none;
+.page-text {
+  color: var(--handwriting-color);
+  font-family: var(--font-handwriting);
 }
 
 #characters {
   margin-block: 8px;
 }
 
-.generated-page {
-  width: 80%;
+.image {
+  width: 100%;
+  margin-top: auto;
+  border-radius: 2px;
 }
 
 #page-number {
@@ -119,49 +93,15 @@ const flipPage = ref(false);
   font-family: var(--font-UI);
 }
 
-.button-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transform: translateZ(var(--book-z));
-  margin-top: auto;
-  margin-bottom: 10px;
-}
-
-.page-button {
-  font-size: 0.7rem;
-  font-weight: 200;
-
-  width: 70px;
-
-  background-color: transparent;
-  color: var(--btn-color);
-
-  text-decoration: underline;
-  text-underline-offset: 2px;
-
-  border: none;
-  cursor: pointer;
-
-  white-space: nowrap;
-  transition: all 350ms ease;
-}
-
-.page-button:hover {
-  text-decoration: none;
-}
-
-.page-button:disabled {
-  cursor: not-allowed;
-  color: rgba(247, 156, 10, 0.621);
-  text-decoration: none;
-}
-
 #arrow {
   all: unset;
   color: var(--btn-color);
   translate: 0px 10px;
+  margin-top: auto;
+}
+
+#arrow:hover {
+  cursor: pointer;
 }
 
 .flipForwards {

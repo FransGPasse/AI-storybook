@@ -21,8 +21,10 @@ onBeforeMount(async () => {
 <template>
   <section class="page-wrapper">
     <h2>All your books!</h2>
-    <div v-for="(book, index) in books" :key="index">
+    <div class="links-wrapper">
       <Button
+        v-for="(book, index) in books"
+        :key="index"
         :text="`${book.title}`"
         secondary
         @click="router.push(`books/${book.id}`)"
@@ -36,6 +38,16 @@ onBeforeMount(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  min-height: 100dvh;
+}
+
+.links-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  gap: 2rem;
+  margin-top: 20px;
 }
 </style>

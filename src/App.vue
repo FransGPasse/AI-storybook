@@ -14,6 +14,7 @@ const helperStore = helper_store();
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@200;400;600&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap");
 
 :root {
   font-size: 1rem;
@@ -22,11 +23,13 @@ const helperStore = helper_store();
   --btn-color: rgb(247, 156, 10);
 
   --text-color: rgb(255, 179, 57);
+  --handwriting-color: rgb(22, 22, 22);
   --page-clr: rgb(232, 230, 218);
   --title-size: 1.7rem;
 
   --font-UI: "Kanit", sans-serif;
   --font-title: "Dancing Script", cursive;
+  --font-handwriting: "Architects Daughter", cursive;
 
   --book-front-h: 400px;
   --book-front-w: 250px;

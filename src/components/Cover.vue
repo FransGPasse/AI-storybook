@@ -42,6 +42,7 @@ function switchImage(direction: string): void {
 }
 
 async function startStory(imageString: string, prompt: string): Promise<void> {
+  helperStore.isLoading = true;
   const docRef = await uploadCover(imageString, prompt);
 
   if (docRef) {
@@ -49,9 +50,10 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
   }
 
   helperStore.currentStoryTitle = prompt;
-
+  helperStore.currentArrayValue = 0;
   flipCover.value = true;
   helperStore.showCoverControls = false;
+  helperStore.isLoading = false;
 }
 </script>
 
@@ -269,6 +271,11 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
 .front,
 .back,
 .last-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
   width: 100%;
   height: 100%;
 }

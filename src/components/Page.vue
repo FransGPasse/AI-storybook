@@ -36,7 +36,8 @@ async function generatePage(prompt: string, number: number): Promise<void> {
 const characterCount = computed((): string => {
   const storyLength = unref(story);
   const minCharacterLength = unref(minimumCharacters);
-  if (storyLength.length >= minCharacterLength) return "✅";
+  if (storyLength.length >= minCharacterLength)
+    return `✅ ${storyLength.length}/300 (max)`;
   return `${story.value.length} / ${minimumCharacters.value}`;
 });
 
@@ -77,18 +78,18 @@ async function finishPage(
           page === 1 ? ' There once was a...' : 'Continue story here...'
         "
         cols="25"
-        rows="5"
-        maxlength="220"
+        rows="7"
+        maxlength="300"
         spellcheck="false"
         v-model="story"
       />
       <p id="characters">Minimum characters: {{ characterCount }}</p>
       <textarea
         v-show="story.length >= 140"
-        class="page-input"
+        class="page-input prompt"
         placeholder="Now write a prompt to create an image to accompany the story..."
         rows="3"
-        cols="20"
+        cols="2"
         maxlength="65"
         required
         spellcheck="false"
@@ -197,6 +198,10 @@ async function finishPage(
 
   cursor: url("../assets/images/writing_hand.png"), auto;
 
+  font-family: var(--font-handwriting);
+
+  color: var(--handwriting-color);
+
   width: 100%;
 }
 
@@ -209,12 +214,21 @@ async function finishPage(
   text-shadow: none;
 }
 
+.prompt {
+  font-family: var(--font-UI);
+  font-size: 10px;
+}
+
 #characters {
-  margin-block: 8px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 10px;
 }
 
 .generated-page {
-  width: 80%;
+  width: 70%;
+  margin-top: auto;
+  border-radius: 2px;
 }
 
 #page-number {
@@ -235,7 +249,7 @@ async function finishPage(
 }
 
 .page-button {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 200;
 
   width: 70px;
