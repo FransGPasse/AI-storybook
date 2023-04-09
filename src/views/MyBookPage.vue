@@ -8,13 +8,11 @@ import { helper_store } from "../store/store";
 const route = useRoute();
 const helperStore = helper_store();
 
-const book = ref<DocumentData | undefined>();
+const book = ref<DocumentData | undefined>({});
 
 onBeforeMount(async (): Promise<void> => {
   helperStore.isLoading = true;
   book.value = await getUserBook(route.params.id);
-
-  console.log("book.value", book.value);
   helperStore.isLoading = false;
 });
 </script>
@@ -22,9 +20,10 @@ onBeforeMount(async (): Promise<void> => {
 <template>
   <div class="page-wrapper">
     <div v-if="book" class="book-wrapper">
-      <h1>{{ book.document.title }}</h1>
-      <img v-for="link in book.links" :src="link" />
-      <div v-for="page in book.document.pages">
+      <h1>{{ book.title }}</h1>
+      <img :src="book.coverImg" />
+      <div v-for="page in book.pages">
+        <img :src="page.image" />
         <p>Page {{ page.pageNumber }}: {{ page.text }}</p>
       </div>
     </div>
@@ -38,8 +37,6 @@ onBeforeMount(async (): Promise<void> => {
   align-items: center;
   justify-content: center;
 
-  height: 100dvh;
-
   padding: 15px;
 }
 
@@ -47,7 +44,5 @@ onBeforeMount(async (): Promise<void> => {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-
-  height: 50%;
 }
 </style>

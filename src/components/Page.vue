@@ -51,20 +51,12 @@ function switchImage(direction: string): void {
 
 async function finishPage(
   imageString: string,
-  currentStoryTitle: string,
   prompt: string,
   docRef: string,
   pageNumber: number,
   story: string
 ): Promise<void> {
-  await uploadPage(
-    imageString,
-    currentStoryTitle,
-    prompt,
-    docRef,
-    pageNumber,
-    story
-  );
+  await uploadPage(imageString, prompt, docRef, pageNumber, story);
 
   flipPage.value = true;
   helperStore.showPageControls = false;
@@ -141,14 +133,7 @@ async function finishPage(
           v-show="helperStore.showPageControls"
           class="page-button"
           @click="
-            finishPage(
-              imageString,
-              helperStore.currentStoryTitle,
-              prompt,
-              helperStore.docRef,
-              page!,
-              story
-            )
+            finishPage(imageString, prompt, helperStore.docRef, page!, story)
           "
           :disabled="!imageString"
         >
