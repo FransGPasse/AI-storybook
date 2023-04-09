@@ -271,13 +271,15 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
 .front,
 .back,
 .last-page {
+  width: 100%;
+  height: 100%;
+}
+
+.last-page {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  width: 100%;
-  height: 100%;
 }
 
 .front {
