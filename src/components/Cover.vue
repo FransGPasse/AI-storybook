@@ -109,7 +109,7 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
         </div>
       </div>
       <Page
-        v-for="(page, index) in helperStore.numberOfPages"
+        v-for="(_, index) in helperStore.numberOfPages"
         :page="index + 1"
         :key="index"
       />
@@ -223,6 +223,9 @@ async function startStory(imageString: string, prompt: string): Promise<void> {
   transition: all 0.7s;
 
   z-index: 1;
+
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .title-input::placeholder {

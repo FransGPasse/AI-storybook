@@ -16,7 +16,8 @@ import Button from "../components/Button.vue";
 .homepage {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;

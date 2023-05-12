@@ -45,29 +45,21 @@ async function uploadCover(
   prompt: string
 ): Promise<string | undefined> {
   try {
+    const coverRef = ref(
+      storage,
+      `${auth.currentUser?.email}/${prompt}/cover_image`
+    );
+    const snapshot = await uploadString(coverRef, b64_string, "data_url");
+
+    const downloadURL = await getDownloadURL(snapshot.ref);
     const colRef = collection(db, `users/${auth.currentUser?.email}/stories`);
-    /* Uploads a document with a title and an empty pages array */
     const docRef = await addDoc(colRef, {
       title: prompt,
+      cover: downloadURL,
       pages: [],
     });
 
-    /* Uses the freshly generated document id to add the generated cover image to a storage folder with the same id as the Firestore document */
-    const coverRef = ref(
-      storage,
-      `${auth.currentUser?.email}/${docRef.id}/${prompt}`
-    );
-    await uploadString(coverRef, b64_string, "data_url");
-    const snapshot = await uploadString(coverRef, b64_string, "data_url");
-
-    /* ...THEN refrences the same document and updates it with the link to the cover image */
-    const downloadURL = await getDownloadURL(snapshot.ref);
-    const document = doc(colRef, docRef.id);
-    await updateDoc(document, {
-      coverImg: downloadURL,
-    });
-
-    /* And returns the refrence to the document so we can save it in our helper store and continue updating the document */
+    /* Returns the refrence to the document so we can save it in our helper store and continue updating the document */
     return docRef.id;
   } catch (error) {
     console.error(error);
@@ -86,9 +78,8 @@ async function uploadPage(
       storage,
       `${auth.currentUser?.email}/${docRef}/${prompt
         .toLowerCase()
-        .replaceAll(" ", "")}`
+        .replaceAll(" ", "_")}`
     );
-
     const snapshot = await uploadString(storageRef, b64_string, "data_url");
     const downloadURL = await getDownloadURL(snapshot.ref);
     const colRef = collection(db, `users/${auth.currentUser?.email}/stories`);

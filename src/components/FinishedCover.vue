@@ -13,7 +13,7 @@ const hasFlipped = ref(false);
 interface IBook {
   title: string;
   pages: IPage[];
-  coverImg: string;
+  cover: string;
 }
 
 const props = defineProps<IBook>();
@@ -28,8 +28,8 @@ const props = defineProps<IBook>();
     >
       <div class="side leather front" :class="{ turnPage: flipCover }">
         <img
-          :src="props.coverImg"
-          :alt="props.coverImg"
+          :src="props.cover"
+          :alt="props.cover"
           class="generated-cover"
           @click="(flipCover = !flipCover), (hasFlipped = true)"
         />

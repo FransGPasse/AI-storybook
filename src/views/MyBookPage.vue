@@ -22,9 +22,9 @@ onBeforeMount(async (): Promise<void> => {
   <div v-if="book" class="my-book-page">
     <FinishedCover
       :title="book.title"
-      :cover-img="book.coverImg"
       :pages="book.pages"
-    ></FinishedCover>
+      :cover="book.cover"
+    />
   </div>
 </template>
 

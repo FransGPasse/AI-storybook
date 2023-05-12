@@ -1,7 +1,7 @@
 export interface IBook {
   title: string;
   pages: IPage[];
-  coverImg: string;
+  cover: string;
 }
 export interface IPage {
   pageNumber: number;
